@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Counter: Smart Contracts Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/lumen/tokens.css">
+  <link rel="stylesheet" href="/shared/lumen/byc.css">
+  <link rel="stylesheet" href="/shared/app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.15.0/ethers.umd.min.js"></script>
+  <script src="/shared/chains.js"></script>
+  <script src="/shared/wallet.js"></script>
+  <script src="/shared/shell.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside id="rail" class="rail" data-theme="dark"></aside>
+
+    <main class="app-main">
+      <div id="cbar" class="classification-bar" role="note" aria-label="View classification">
+        <span class="cb-mark">Loading</span>
+        <span class="cb-subject">Counter</span>
+        <span class="cb-spacer"></span>
+        <span class="cb-meta"></span>
+      </div>
+
+      <div class="view-head">
+        <div class="stack">
+          <span class="eyebrow">/01 &nbsp; Counter</span>
+          <h1 class="h3">Counter</h1>
+          <p class="body-sm text-muted">One number on chain. Read it, change it, and watch the event log prove what happened.</p>
+        </div>
+        <div class="cluster">
+          <div class="field">
+            <label for="network" class="caption">Deployment</label>
+            <select id="network" class="select"></select>
+          </div>
+          <button id="connect" class="btn">Connect wallet</button>
+        </div>
+      </div>
+
+      <div id="notice" class="hidden"></div>
+
+      <div class="metric-strip" aria-label="Counter summary">
+        <div class="metric"><div class="metric-label">Number</div><div class="metric-value" id="m-number">…</div><div class="metric-delta" id="m-number-delta"></div></div>
+        <div class="metric"><div class="metric-label">Block height</div><div class="metric-value" id="m-block">…</div></div>
+        <div class="metric"><div class="metric-label">Your balance</div><div class="metric-value" id="m-balance">…</div><div class="metric-delta" id="m-currency"></div></div>
+        <div class="metric"><div class="metric-label">Txs this session</div><div class="metric-value" id="m-txs">0</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Operations</span><span class="mono text-subtle" id="op-state">read only</span></div>
+          <div class="panel-body">
+            <div class="stack">
+              <div class="cluster">
+                <button id="increment" class="btn btn-primary" disabled>Increment</button>
+                <button id="decrement" class="btn btn-ghost" disabled>Decrement</button>
+              </div>
+              <div class="field">
+                <label for="newValue">Set number (owner only)</label>
+                <div class="cluster">
+                  <input id="newValue" class="input mono" type="number" min="0" step="1" placeholder="42" style="max-width: 12rem">
+                  <button id="setNumber" class="btn btn-ghost" disabled>Set number</button>
+                </div>
+                <span class="hint" id="owner-hint">Only the deployer may call setNumber. Everyone else is reverted with NotOwner.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proof" id="proof">
+          <div class="proof-head">
+            <span class="proof-seal" id="proof-seal" aria-hidden="true">&#8943;</span>
+            <span class="proof-titles"><span class="proof-title">Last transaction</span><span class="proof-sub" id="proof-sub">none yet</span></span>
+            <span class="badge badge-neutral" id="proof-badge">Idle</span>
+          </div>
+          <div class="proof-body">
+            <dl class="detail-list" id="proof-list">
+              <dt>Function</dt><dd class="mono" id="p-fn">…</dd>
+              <dt>From</dt><dd class="mono" id="p-from">…</dd>
+              <dt>Block</dt><dd class="mono" id="p-block">…</dd>
+              <dt>Gas used</dt><dd class="mono" id="p-gas">…</dd>
+            </dl>
+          </div>
+          <div class="proof-foot"><span>TX</span><span id="p-hash">send a transaction to see its proof here</span></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Event log</span><span class="mono text-subtle" id="ev-count">NumberChanged</span></div>
+          <div class="panel-body">
+            <ul class="timeline" id="timeline"></ul>
+            <div id="timeline-empty" class="empty hidden">
+              <span class="empty-mark">NO EVENTS</span>
+              <h2 class="empty-title">No NumberChanged events yet</h2>
+              <p class="empty-body">Call increment, decrement, or setNumber. Each one emits an event that lands here.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Contract</span><span class="mono text-subtle">Counter.sol</span></div>
+          <div class="panel-body">
+            <dl class="detail-list">
+              <dt>Address</dt><dd><span class="hash" id="c-address-hash"><span class="hash-text" id="c-address">…</span><button class="hash-copy" id="c-address-copy" aria-label="Copy contract address">Copy</button></span></dd>
+              <dt>Owner</dt><dd class="mono" id="c-owner">…</dd>
+              <dt>Network</dt><dd class="mono" id="c-network">…</dd>
+              <dt>Deployed</dt><dd class="mono" id="c-deployed">…</dd>
+              <dt>Explorer</dt><dd id="c-explorer">…</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (async () => {
+      const $ = (id) => document.getElementById(id);
+      const CONTRACT = "Counter";
+
+      await Shell.mount({ active: "counter" });
+      const deployments = await Lab.loadDeployments();
+      const available = Object.keys(deployments).filter((id) => deployments[id].contracts[CONTRACT]);
+
+      // State for the page. Everything else reads from these.
+      let chainId = null;        // the deployment the page is showing
+      let reader = null;         // read-only provider for that chain
+      let contract = null;       // ethers.Contract bound to the reader
+      let account = null;        // connected wallet account, if any
+      let walletChain = null;    // chain the wallet is on
+      let txCount = 0;
+      let lastNumber = null;
+
+      // ---- Notices -------------------------------------------------------------
+      function notice(kind, title, body, action) {
+        const el = $("notice");
+        if (!kind) { el.className = "hidden"; el.innerHTML = ""; return; }
+        el.className = `alert alert-${kind}`;
+        el.innerHTML = `<span class="alert-mark" aria-hidden="true">${kind === "danger" ? "&#215;" : "!"}</span>
+          <div class="alert-content"><div class="alert-title">${title}</div><div class="alert-body">${body}</div>
+          ${action ? `<div class="cluster" style="margin-top: var(--sp-2)"><button class="btn btn-sm" id="notice-action">${action.label}</button></div>` : ""}</div>`;
+        if (action) $("notice-action").addEventListener("click", action.run);
+      }
+
+      if (!available.length) {
+        notice("warning", "Counter is not deployed yet", "Run <code>make deploy NETWORK=local CONTRACT=Counter</code> (with Anvil running), then reload this page.");
+        Shell.classify({ network: "No deployment", subject: "Counter" });
+        return;
+      }
+
+      // ---- Deployment selector --------------------------------------------------
+      const select = $("network");
+      select.innerHTML = available.map((id) => `<option value="${id}">${deployments[id].name} (${id})</option>`).join("");
+      select.addEventListener("change", () => useChain(Number(select.value)));
+
+      // ---- Bind to a chain --------------------------------------------------------
+      async function useChain(id) {
+        if (contract) contract.removeAllListeners();
+        chainId = id;
+        select.value = String(id);
+        const dep = deployments[id].contracts[CONTRACT];
+        const chain = Lab.CHAINS[id];
+        reader = Lab.readProvider(id);
+        contract = new ethers.Contract(dep.address, dep.abi, reader);
+
+        $("c-address").textContent = dep.address;
+        $("c-address-copy").onclick = (e) => Lab.copy(dep.address, e.target);
+        $("c-network").textContent = `${chain.name} (${id})`;
+        $("c-deployed").textContent = dep.deployedAt ? dep.deployedAt.replace("T", " ").slice(0, 19) + " UTC" + (dep.block ? `, block ${dep.block}` : "") : "unknown";
+        const link = Lab.explorerLink(id, "address", dep.address);
+        $("c-explorer").innerHTML = link ? `<a href="${link}" target="_blank" rel="noopener">${link.replace("https://", "")}</a>` : '<span class="text-muted">Anvil has no explorer. Use <code>cast</code> in the terminal.</span>';
+        $("m-currency").textContent = chain.currency;
+
+        try {
+          $("c-owner").textContent = await contract.owner();
+        } catch (err) {
+          notice("danger", "Cannot reach the chain", `${Lab.explain(err)}. Is Anvil running? If you restarted it, deploy again.`);
+          return;
+        }
+        notice(null);
+        await refreshReads();
+        await loadEvents(dep.block || 0);
+        contract.on("NumberChanged", onEvent);
+        syncWalletState();
+      }
+
+      async function refreshReads() {
+        try {
+          const [number, block] = await Promise.all([contract.number(), reader.getBlockNumber()]);
+          const n = Number(number);
+          const delta = $("m-number-delta");
+          if (lastNumber !== null && n !== lastNumber) {
+            delta.textContent = (n > lastNumber ? "▲ +" : "▼ ") + (n - lastNumber);
+            delta.className = "metric-delta " + (n > lastNumber ? "is-up" : "is-down");
+          }
+          lastNumber = n;
+          $("m-number").textContent = n;
+          $("m-block").textContent = block;
+          Shell.classify({ network: Lab.CHAINS[chainId].name, subject: `Counter ${Lab.short(contract.target)}`, chainId, block });
+          if (account) {
+            const bal = await reader.getBalance(account);
+            $("m-balance").textContent = Number(ethers.formatEther(bal)).toFixed(4);
+          }
+        } catch (err) {
+          console.warn("read failed", err);
+        }
+      }
+      setInterval(refreshReads, 4000);
+
+      // ---- Events ----------------------------------------------------------------
+      const seen = new Set();
+      function addEvent(by, value, blockNumber, txHash, when, live) {
+        const key = `${txHash}:${value}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const li = document.createElement("li");
+        li.className = "timeline-item";
+        const txLink = Lab.explorerLink(chainId, "tx", txHash);
+        li.innerHTML = `<span class="timeline-node ${live ? "is-success" : "is-info"}" aria-hidden="true"></span>
+          <div class="timeline-time">${when} · block ${blockNumber}</div>
+          <div class="timeline-title">NumberChanged → ${value}</div>
+          <div class="timeline-body">by <span class="mono">${by}</span><br>tx <span class="mono">${txLink ? `<a href="${txLink}" target="_blank" rel="noopener">${txHash}</a>` : txHash}</span></div>`;
+        $("timeline").prepend(li);
+        $("ev-count").textContent = `${seen.size} NumberChanged`;
+        $("timeline-empty").classList.add("hidden");
+      }
+      async function loadEvents(fromBlock) {
+        $("timeline").innerHTML = ""; seen.clear();
+        try {
+          const logs = await contract.queryFilter(contract.filters.NumberChanged(), fromBlock, "latest");
+          for (const log of logs) {
+            const blk = await log.getBlock();
+            addEvent(log.args.by, log.args.newValue.toString(), log.blockNumber, log.transactionHash, Lab.utc(new Date(blk.timestamp * 1000)), false);
+          }
+        } catch (err) { console.warn("event query failed", err); }
+        if (!seen.size) $("timeline-empty").classList.remove("hidden");
+      }
+      function onEvent(by, newValue, ev) {
+        addEvent(by, newValue.toString(), ev.log.blockNumber, ev.log.transactionHash, Lab.utc(), true);
+        refreshReads();
+      }
+
+      // ---- Wallet -----------------------------------------------------------------
+      const connectBtn = $("connect");
+      connectBtn.addEventListener("click", async () => {
+        try { await Lab.connect(); } catch (err) { notice("danger", "Wallet", Lab.explain(err)); }
+        syncWalletState();
+      });
+      Lab.onWalletChange(syncWalletState);
+
+      async function syncWalletState() {
+        account = await Lab.currentAccount();
+        walletChain = await Lab.currentChainId();
+        connectBtn.textContent = account ? Lab.short(account) : (Lab.hasWallet() ? "Connect wallet" : "No wallet detected");
+        const ready = account && walletChain === chainId;
+        for (const id of ["increment", "decrement", "setNumber"]) $(id).disabled = !ready;
+        $("op-state").textContent = ready ? `signing as ${Lab.short(account)}` : "read only";
+        if (account && walletChain !== chainId) {
+          notice("warning", "Wallet is on the wrong network", `Your wallet is on chain ${walletChain}. This deployment lives on ${Lab.CHAINS[chainId].name} (chain ${chainId}).`,
+            { label: `Switch to ${Lab.CHAINS[chainId].name}`, run: () => Lab.switchChain(chainId).catch((e) => notice("danger", "Switch failed", Lab.explain(e))) });
+        } else if (account) {
+          notice(null);
+        }
+        refreshReads();
+      }
+
+      // ---- Transactions -----------------------------------------------------------
+      async function send(fnName, args) {
+        const signer = await Lab.browserProvider().getSigner();
+        const writable = contract.connect(signer);
+        setProof("pending", fnName, { from: account });
+        try {
+          const tx = await writable[fnName](...args);
+          setProof("pending", fnName, { from: account, hash: tx.hash });
+          const receipt = await tx.wait();
+          txCount += 1; $("m-txs").textContent = txCount;
+          setProof(receipt.status === 1 ? "verified" : "failed", fnName, { from: account, hash: tx.hash, block: receipt.blockNumber, gas: receipt.gasUsed.toString() });
+        } catch (err) {
+          setProof("failed", fnName, { from: account, error: Lab.explain(err) });
+        }
+        refreshReads();
+      }
+      $("increment").addEventListener("click", () => send("increment", []));
+      $("decrement").addEventListener("click", () => send("decrement", []));
+      $("setNumber").addEventListener("click", () => {
+        const v = $("newValue").value;
+        if (v === "" || Number(v) < 0) { $("newValue").focus(); return; }
+        send("setNumber", [BigInt(v)]);
+      });
+
+      function setProof(state, fn, d) {
+        const seal = $("proof-seal"), badge = $("proof-badge");
+        const map = {
+          pending:  ["is-pending", "badge-warning", "Pending",  "&#8943;"],
+          verified: ["",           "badge-success", "Verified", "&#10003;"],
+          failed:   ["is-failed",  "badge-danger",  "Failed",   "&#215;"],
+        }[state];
+        seal.className = `proof-seal ${map[0]}`; seal.innerHTML = map[3];
+        badge.className = `badge ${map[1]}`; badge.textContent = map[2];
+        $("proof-sub").textContent = d.hash ? Lab.short(d.hash) : "awaiting signature";
+        $("p-fn").textContent = `${fn}()`;
+        $("p-from").textContent = d.from || "…";
+        $("p-block").textContent = d.block != null ? d.block : (d.error ? "not mined" : "…");
+        $("p-gas").textContent = d.gas || (d.error ? d.error : "…");
+        const link = d.hash && Lab.explorerLink(chainId, "tx", d.hash);
+        $("p-hash").innerHTML = d.hash ? (link ? `<a href="${link}" target="_blank" rel="noopener">${d.hash}</a>` : d.hash) : (d.error || "waiting for wallet");
+      }
+
+      // ---- Start -------------------------------------------------------------------
+      // Prefer the deployment on the chain the wallet is already on.
+      const wc = await Lab.currentChainId();
+      await useChain(wc && available.includes(String(wc)) ? wc : Number(available[0]));
+    })();
+  </script>
+</body>
+</html>

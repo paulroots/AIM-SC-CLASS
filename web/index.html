@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Contracts Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/lumen/tokens.css">
+  <link rel="stylesheet" href="/shared/lumen/byc.css">
+  <link rel="stylesheet" href="/shared/app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.15.0/ethers.umd.min.js"></script>
+  <script src="/shared/chains.js"></script>
+  <script src="/shared/wallet.js"></script>
+  <script src="/shared/shell.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside id="rail" class="rail" data-theme="dark"></aside>
+
+    <main class="app-main">
+      <div id="cbar" class="classification-bar" role="note" aria-label="View classification">
+        <span class="cb-mark">Overview</span>
+        <span class="cb-subject">Deployments</span>
+        <span class="cb-spacer"></span>
+        <span class="cb-meta"></span>
+      </div>
+
+      <div class="view-head">
+        <div class="stack">
+          <span class="eyebrow">/00 &nbsp; Overview</span>
+          <h1 class="h3">Deployed contracts</h1>
+          <p class="body-sm text-muted">Every contract this machine has deployed, by network. Open a dApp from the rail to interact with it.</p>
+        </div>
+        <div class="cluster">
+          <button id="connect" class="btn">Connect wallet</button>
+        </div>
+      </div>
+
+      <div class="metric-strip" aria-label="Network summary">
+        <div class="metric"><div class="metric-label">Networks</div><div class="metric-value" id="m-networks">0</div></div>
+        <div class="metric"><div class="metric-label">Contracts</div><div class="metric-value" id="m-contracts">0</div></div>
+        <div class="metric"><div class="metric-label">Wallet chain</div><div class="metric-value" id="m-chain">none</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Deployment ledger</span>
+          <span class="mono text-subtle" id="ledger-src">web/deployments.json</span>
+        </div>
+        <div class="panel-body" id="ledger"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Networks</span></div>
+        <div class="panel-body table-frame">
+          <table class="data-table">
+            <thead><tr><th scope="col">Network</th><th scope="col">Chain id</th><th scope="col">RPC</th><th scope="col">Gas token</th><th scope="col">Explorer</th><th scope="col"></th></tr></thead>
+            <tbody id="networks"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (async () => {
+      const dapps = await Shell.mount({ active: "overview" });
+      const deployments = await Lab.loadDeployments();
+      const chainIds = Object.keys(deployments);
+      const pathFor = (name) => (dapps.find((d) => d.contract === name) || {}).path;
+
+      // Metrics
+      document.getElementById("m-networks").textContent = chainIds.length;
+      document.getElementById("m-contracts").textContent = chainIds.reduce((n, id) => n + Object.keys(deployments[id].contracts).length, 0);
+
+      // Ledger
+      const ledger = document.getElementById("ledger");
+      if (!chainIds.length) {
+        ledger.innerHTML = `
+          <div class="empty">
+            <span class="empty-mark">EMPTY LEDGER</span>
+            <h2 class="empty-title">Nothing deployed yet</h2>
+            <p class="empty-body">Start Anvil, then deploy the Counter. The deployment is recorded here automatically.</p>
+            <div class="code-block" style="text-align:left; width:100%"><div class="code-block-head"><span>terminal</span></div><pre><code>make anvil
+make deploy NETWORK=local CONTRACT=Counter</code></pre></div>
+          </div>`;
+      } else {
+        const rows = [];
+        for (const id of chainIds) {
+          const net = deployments[id];
+          for (const [name, c] of Object.entries(net.contracts)) {
+            const path = pathFor(name);
+            const link = (kind, v) => Lab.explorerLink(id, kind, v);
+            rows.push(`<tr>
+              <td>${path ? `<a href="/${path}/">${name}</a>` : name}</td>
+              <td><span class="badge ${id === "31337" ? "badge-neutral" : "badge-info"}">${net.name}</span></td>
+              <td class="id">${link("address", c.address) ? `<a href="${link("address", c.address)}" target="_blank" rel="noopener">${c.address}</a>` : c.address}</td>
+              <td class="num">${c.block ?? ""}</td>
+              <td class="id">${c.deployedAt ? c.deployedAt.replace("T", " ").slice(0, 19) + " UTC" : ""}</td>
+              <td class="id">${link("tx", c.tx) ? `<a href="${link("tx", c.tx)}" target="_blank" rel="noopener">${Lab.short(c.tx)}</a>` : Lab.short(c.tx)}</td>
+            </tr>`);
+          }
+        }
+        ledger.innerHTML = `<div class="table-frame"><table class="data-table">
+          <thead><tr><th scope="col">Contract</th><th scope="col">Network</th><th scope="col">Address</th><th scope="col">Block</th><th scope="col">Deployed</th><th scope="col">Tx</th></tr></thead>
+          <tbody>${rows.join("")}</tbody></table></div>`;
+      }
+
+      // Networks table
+      const tbody = document.getElementById("networks");
+      tbody.innerHTML = Object.entries(Lab.CHAINS).map(([id, ch]) => `<tr>
+        <td>${ch.name}</td><td class="num">${id}</td><td class="id">${ch.rpc}</td><td class="id">${ch.currency}</td>
+        <td class="id">${ch.explorer ? `<a href="${ch.explorer}" target="_blank" rel="noopener">${ch.explorer.replace("https://", "")}</a>` : "none"}</td>
+        <td><button class="btn btn-ghost btn-sm" data-add="${id}">Add to wallet</button></td>
+      </tr>`).join("");
+      tbody.addEventListener("click", async (e) => {
+        const id = e.target.dataset.add;
+        if (!id) return;
+        try { await Lab.switchChain(Number(id)); refresh(); } catch (err) { alert(Lab.explain(err)); }
+      });
+
+      // Wallet
+      const connectBtn = document.getElementById("connect");
+      async function refresh() {
+        const acct = await Lab.currentAccount();
+        const chainId = await Lab.currentChainId();
+        connectBtn.textContent = acct ? Lab.short(acct) : "Connect wallet";
+        document.getElementById("m-chain").textContent = chainId ? String(chainId) : "none";
+        const chain = chainId && Lab.CHAINS[chainId];
+        Shell.classify({ network: chain ? chain.name : (chainId ? `Chain ${chainId}` : "Wallet not connected"), subject: "Deployments", chainId });
+      }
+      connectBtn.addEventListener("click", async () => { try { await Lab.connect(); refresh(); } catch (err) { alert(Lab.explain(err)); } });
+      Lab.onWalletChange(refresh);
+      if (!Lab.hasWallet()) connectBtn.textContent = "No wallet detected";
+      refresh();
+    })();
+  </script>
+</body>
+</html>

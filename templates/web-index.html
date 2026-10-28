@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__NAME__: Smart Contracts Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/lumen/tokens.css">
+  <link rel="stylesheet" href="/shared/lumen/byc.css">
+  <link rel="stylesheet" href="/shared/app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.15.0/ethers.umd.min.js"></script>
+  <script src="/shared/chains.js"></script>
+  <script src="/shared/wallet.js"></script>
+  <script src="/shared/shell.js"></script>
+  <script src="/shared/abi-ui.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside id="rail" class="rail" data-theme="dark"></aside>
+
+    <main class="app-main">
+      <div id="cbar" class="classification-bar" role="note" aria-label="View classification">
+        <span class="cb-mark">Loading</span>
+        <span class="cb-subject">__NAME__</span>
+        <span class="cb-spacer"></span>
+        <span class="cb-meta"></span>
+      </div>
+
+      <div class="view-head">
+        <div class="stack">
+          <span class="eyebrow">Contract &nbsp; __NAME__</span>
+          <h1 class="h3">__NAME__</h1>
+          <p class="body-sm text-muted">This page is generated from the contract ABI. Replace it with a hand-built view once the contract settles.</p>
+        </div>
+        <div class="cluster">
+          <div class="field">
+            <label for="network" class="caption">Deployment</label>
+            <select id="network" class="select"></select>
+          </div>
+          <button id="connect" class="btn">Connect wallet</button>
+        </div>
+      </div>
+
+      <div id="notice" class="hidden"></div>
+
+      <!-- AbiUI fills these four regions from the ABI: reads, writes, events, and contract facts. -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">State</span><span class="mono text-subtle">view functions</span></div>
+          <div class="panel-body" id="reads"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Operations</span><span class="mono text-subtle" id="op-state">read only</span></div>
+          <div class="panel-body" id="writes"></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Event log</span><span class="mono text-subtle" id="ev-count">events</span></div>
+          <div class="panel-body"><ul class="timeline" id="timeline"></ul></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Contract</span><span class="mono text-subtle">__NAME__.sol</span></div>
+          <div class="panel-body"><dl class="detail-list" id="facts"></dl></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    AbiUI.boot({ contract: "__NAME__", active: "__name__" });
+  </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+/* ============================================================================
+   Lumen Design System: Token Layer
+   Generated contract from foundations/tokens.json. Import this before byc.css.
+   Structure: primitives (brand-agnostic) -> semantic (themed) -> brand overrides.
+   Theme: light on :root, dark under [data-theme="dark"] and prefers-color-scheme.
+   Brand: Lumen (monochrome) is the default identity for BYC and Lumen alike.
+   CoRa attaches with data-brand="cora", DOE with data-brand="doe".
+   ============================================================================ */
+
+:root {
+  /* -- Primitive: ink ramp ------------------------------------------------ */
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  /* -- Primitive: functional (status) ------------------------------------- */
+  --fn-success: #1f9d55; --fn-success-dark: #3ecf8e;
+  --fn-warning: #c98a00; --fn-warning-dark: #e8b23a;
+  --fn-danger:  #d1403f; --fn-danger-dark:  #ec5f5f;
+  --fn-info:    #3b6fe0; --fn-info-dark:    #6d8bff;
+
+  /* -- Primitive: chart categorical --------------------------------------- */
+  --chart-1: #4d70ff; --chart-2: #1f9d55; --chart-3: #c98a00; --chart-4: #d1403f;
+  --chart-5: #7b5bd6; --chart-6: #2aa6b5; --chart-7: #8a8a8a; --chart-8: #e05fa0;
+
+  /* -- Primitive: overlay ------------------------------------------------- */
+  --overlay-scrim: rgba(0, 0, 0, 0.5); --overlay-scrim-dark: rgba(0, 0, 0, 0.64);
+
+  /* -- Primitive: type ---------------------------------------------------- */
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-editorial-display: 'Neue Machina', 'Sora', sans-serif;
+  --font-editorial-quote: 'Agrandir', 'Sora', sans-serif;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-10: 0.625rem; --fs-11: 0.6875rem; --fs-12: 0.75rem; --fs-13: 0.8125rem;
+  --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem; --fs-20: 1.25rem;
+  --fs-24: 1.5rem; --fs-28: 1.75rem; --fs-36: 2.25rem; --fs-48: 3rem;
+  --fs-64: 4rem; --fs-80: 5rem;
+
+  --lh-none: 1; --lh-tight: 1.1; --lh-snug: 1.25; --lh-normal: 1.5; --lh-relaxed: 1.6;
+  --tr-display: -0.04em; --tr-tight: -0.02em; --tr-normal: 0; --tr-label: 0.02em; --tr-eyebrow: 0.08em;
+
+  /* -- Primitive: space / radius / border --------------------------------- */
+  --sp-0: 0; --sp-1: 0.25rem; --sp-2: 0.5rem; --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.25rem; --sp-6: 1.5rem; --sp-8: 2rem; --sp-10: 2.5rem; --sp-12: 3rem;
+  --sp-16: 4rem; --sp-20: 5rem; --sp-24: 6rem; --sp-32: 8rem;
+
+  --radius-0: 0; --radius-sm: 2px; --radius-md: 4px; --radius-lg: 8px; --radius-full: 9999px;
+  --border-w: 1px; --border-w-strong: 2px;
+
+  /* -- Primitive: motion -------------------------------------------------- */
+  --dur-fast: 160ms; --dur-base: 320ms; --dur-slow: 480ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-inout-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-in-cubic: cubic-bezier(0.32, 0, 0.67, 0);
+  --ease-inout-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* -- Primitive: deck (presentation stage, presentations/engine/deck.js) -- */
+  /* Longer than interface motion on purpose: a projected stage carries one
+     object across a scene change. Read by deck.js, not by CSS transitions. */
+  --dur-deck-text-in: 950ms; --dur-deck-text-out: 500ms; --dur-deck-fade: 400ms;
+  --dur-deck-leave: 800ms; --dur-deck-carry: 1200ms; --dur-deck-carry-long: 1400ms;
+  --dur-deck-arrive: 1400ms;
+  --stagger-deck-line: 90ms; --stagger-deck-group: 60ms; --stagger-deck-tight: 40ms;
+  /* The fixed 1920 by 1080 stage. Rem resolves at 16px: the stage scales as one transform. */
+  --deck-stage-w: 1920px; --deck-stage-h: 1080px;
+  --deck-margin-x: 7.5rem; --deck-margin-top: 4rem; --deck-margin-bottom: 3.5rem;
+  --deck-head-top: 10.875rem; --deck-head-low: 10.5rem; --deck-head-left: 23.75rem;
+  --fs-deck-figure: 20rem; --fs-deck-statement: 8.75rem;
+  --fs-deck-headline: 6rem; --fs-deck-headline-dense: 4.5rem;
+  --fs-deck-subline: 1.875rem; --fs-deck-body: 1.5rem;
+  --tr-deck-display: -0.055em; --tr-deck-figure: -0.07em;
+
+  /* -- Primitive: layout -------------------------------------------------- */
+  --container-prose: 42rem; --container-content: 72rem; --container-wide: 80rem;
+  --z-base: 0; --z-raised: 10; --z-sticky: 100; --z-overlay: 1000; --z-modal: 1100; --z-toast: 1200;
+
+  /* ======================================================================
+     SEMANTIC (light, Lumen default): components consume ONLY these.
+     ====================================================================== */
+  --color-bg: var(--ink-50);
+  --color-bg-raised: var(--ink-0);
+  --color-bg-sunken: var(--ink-100);
+  --color-bg-inverse: var(--ink-850);
+  --color-text: var(--ink-950);
+  --color-text-muted: var(--ink-500);
+  --color-text-subtle: var(--ink-400);
+  --color-text-inverse: var(--ink-0);
+  --color-border: rgba(0, 0, 0, 0.12);
+  --color-border-strong: rgba(0, 0, 0, 0.22);
+  --color-accent: var(--ink-950);
+  --color-accent-hover: var(--ink-800);
+  --color-on-accent: var(--ink-0);
+  --color-focus-ring: var(--ink-500);
+  --color-scrim: var(--overlay-scrim);
+  --color-success: var(--fn-success);
+  --color-warning: var(--fn-warning);
+  --color-danger: var(--fn-danger);
+  --color-info: var(--fn-info);
+
+  /* Link roles. Alias the accent by default. A brand whose accent fails text
+     contrast on its ground (CoRa orange on cream) re-maps these alone. */
+  --color-link: var(--color-accent);
+  --color-link-hover: var(--color-accent-hover);
+
+  /* Illustration roles (system/illo.js). line draws the figure, accent is the
+     one element that moves the eye. Three surface tones: page ground, inverse
+     surface, and a surface filled with the accent. */
+  --color-illo-line: var(--ink-500);          --color-illo-accent: var(--ink-950);
+  --color-illo-line-inverse: var(--ink-400);  --color-illo-accent-inverse: var(--ink-0);
+  --color-illo-line-on-accent: var(--ink-400); --color-illo-accent-on-accent: var(--ink-0);
+
+  /* Shader roles (system/shaders.js). back is the ground; 1 to 4 run quiet to
+     loud: near-ground, mid, brand, highlight. Monochrome by default. */
+  --color-shader-back: var(--ink-50);
+  --color-shader-1: var(--ink-0);   --color-shader-2: var(--ink-200);
+  --color-shader-3: var(--ink-500); --color-shader-4: var(--ink-950);
+
+  /* Hairline roles (system/hairline.js). Isometric line figures: plate fills
+     every solid with the ground it sits on, hi is the one bright stroke, edge
+     the silhouette, mid the inner lines, lo the dim guides. hi is the one
+   place a brand accent may enter (CoRa: radar orange); Lumen keeps ink.
+     Three surface tones like the illo roles; raised swaps plate only. */
+  --color-hairline-plate: var(--color-bg); --color-hairline-hi: var(--ink-950); --color-hairline-edge: var(--ink-500); --color-hairline-mid: var(--ink-500); --color-hairline-lo: var(--ink-400);
+  --color-hairline-plate-inverse: var(--color-bg-inverse); --color-hairline-hi-inverse: var(--ink-25); --color-hairline-edge-inverse: var(--ink-400); --color-hairline-mid-inverse: var(--ink-400); --color-hairline-lo-inverse: var(--ink-500);
+  --color-hairline-plate-on-accent: var(--color-accent); --color-hairline-hi-on-accent: var(--ink-25); --color-hairline-edge-on-accent: var(--ink-400); --color-hairline-mid-on-accent: var(--ink-400); --color-hairline-lo-on-accent: var(--ink-500);
+  --hairline-stroke: 0.9;
+
+  /* Font roles. Components set human language in these, never --font-sans
+     directly, so a brand can change its faces. Machine text stays --font-mono. */
+  --font-display: var(--font-sans);
+  --font-body: var(--font-sans);
+
+  /* Chart series roles. Semantic aliases of the categorical ramp so chart
+     components consume --color-chart-N, never the primitive. Theme-constant:
+     a series keeps its identity across light and dark. */
+  --color-chart-1: var(--chart-1); --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3); --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5); --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7); --color-chart-8: var(--chart-8);
+
+  /* Deck roles (presentations/engine/deck.js). Defined once: they derive from
+     the themed roles above, so they follow data-theme and data-brand on <html>.
+     deck-accent follows hairline-hi, the one place a brand accent enters. */
+  --motion-deck-arrive: var(--ease-out-quart);
+  --motion-deck-move: var(--ease-inout-cubic);
+  --motion-deck-stamp: var(--ease-out-quint);
+  --motion-deck-leave: var(--ease-in-cubic);
+  --color-deck-texture: color-mix(in srgb, var(--color-text) 6%, transparent);
+  --color-deck-glyph-faint: color-mix(in srgb, var(--color-text) 14%, transparent);
+  --color-deck-accent: var(--color-hairline-hi);
+  --color-deck-on-accent: var(--color-on-accent);
+
+  color-scheme: light;
+}
+
+/* ========================================================================
+   DARK THEME: system preference (unless explicitly set to light)
+   ======================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: var(--ink-950);
+    --color-bg-raised: var(--ink-900);
+    --color-bg-sunken: var(--ink-1000);
+    --color-bg-inverse: var(--ink-50);
+    --color-text: var(--ink-25);
+    --color-text-muted: var(--ink-400);
+    --color-text-subtle: var(--ink-500);
+    --color-text-inverse: var(--ink-1000);
+    --color-border: rgba(255, 255, 255, 0.12);
+    --color-border-strong: rgba(255, 255, 255, 0.24);
+    --color-accent: var(--ink-25);
+    --color-accent-hover: var(--ink-200);
+    --color-on-accent: var(--ink-1000);
+    --color-focus-ring: var(--ink-300);
+    --color-scrim: var(--overlay-scrim-dark);
+    --color-success: var(--fn-success-dark);
+    --color-warning: var(--fn-warning-dark);
+    --color-danger: var(--fn-danger-dark);
+    --color-info: var(--fn-info-dark);
+    --color-illo-line: var(--ink-400);          --color-illo-accent: var(--ink-25);
+    --color-illo-line-inverse: var(--ink-500);  --color-illo-accent-inverse: var(--ink-950);
+    --color-illo-line-on-accent: var(--ink-500); --color-illo-accent-on-accent: var(--ink-950);
+    --color-shader-back: var(--ink-1000);
+    --color-shader-1: var(--ink-900);   --color-shader-2: var(--ink-700);
+    --color-shader-3: var(--ink-400);   --color-shader-4: var(--ink-25);
+    --color-hairline-plate: var(--color-bg); --color-hairline-hi: var(--ink-25); --color-hairline-edge: var(--ink-400); --color-hairline-mid: var(--ink-400); --color-hairline-lo: var(--ink-500);
+    --color-hairline-plate-inverse: var(--color-bg-inverse); --color-hairline-hi-inverse: var(--ink-950); --color-hairline-edge-inverse: var(--ink-500); --color-hairline-mid-inverse: var(--ink-500); --color-hairline-lo-inverse: var(--ink-400);
+    --color-hairline-plate-on-accent: var(--color-accent); --color-hairline-hi-on-accent: var(--ink-950); --color-hairline-edge-on-accent: var(--ink-500); --color-hairline-mid-on-accent: var(--ink-500); --color-hairline-lo-on-accent: var(--ink-400);
+    color-scheme: dark;
+  }
+}
+
+/* ========================================================================
+   DARK THEME: explicit opt-in (wins in both directions)
+   On <html> it themes the page. On any other element it themes that subtree
+   (a dark sidebar, a coachmark on a light page). A themed subtree must set
+   its own background and color, since those do not re-inherit on their own.
+   ======================================================================== */
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-bg-sunken: var(--ink-1000);
+  --color-bg-inverse: var(--ink-50);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-400);
+  --color-text-subtle: var(--ink-500);
+  --color-text-inverse: var(--ink-1000);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+  --color-accent-hover: var(--ink-200);
+  --color-on-accent: var(--ink-1000);
+  --color-focus-ring: var(--ink-300);
+  --color-scrim: var(--overlay-scrim-dark);
+  --color-success: var(--fn-success-dark);
+  --color-warning: var(--fn-warning-dark);
+  --color-danger: var(--fn-danger-dark);
+  --color-info: var(--fn-info-dark);
+  --color-illo-line: var(--ink-400);          --color-illo-accent: var(--ink-25);
+  --color-illo-line-inverse: var(--ink-500);  --color-illo-accent-inverse: var(--ink-950);
+  --color-illo-line-on-accent: var(--ink-500); --color-illo-accent-on-accent: var(--ink-950);
+  --color-shader-back: var(--ink-1000);
+  --color-shader-1: var(--ink-900);   --color-shader-2: var(--ink-700);
+  --color-shader-3: var(--ink-400);   --color-shader-4: var(--ink-25);
+  --color-hairline-plate: var(--color-bg); --color-hairline-hi: var(--ink-25); --color-hairline-edge: var(--ink-400); --color-hairline-mid: var(--ink-400); --color-hairline-lo: var(--ink-500);
+  --color-hairline-plate-inverse: var(--color-bg-inverse); --color-hairline-hi-inverse: var(--ink-950); --color-hairline-edge-inverse: var(--ink-500); --color-hairline-mid-inverse: var(--ink-500); --color-hairline-lo-inverse: var(--ink-400);
+  --color-hairline-plate-on-accent: var(--color-accent); --color-hairline-hi-on-accent: var(--ink-950); --color-hairline-edge-on-accent: var(--ink-500); --color-hairline-mid-on-accent: var(--ink-500); --color-hairline-lo-on-accent: var(--ink-400);
+  color-scheme: dark;
+}
+
+/* ========================================================================
+   BRAND OVERRIDES: set data-brand on <html> or a subtree.
+   Lumen (monochrome) is the base identity above and needs no override: it is
+   shared by BYC and Lumen. Additional brands attach here as
+   :root[data-brand="<name>"] blocks that re-map semantic roles only. A thin
+   brand re-maps the accent; a full identity (CoRa) re-maps grounds, text,
+   links, fonts, illustration, and shader roles, never status or chart roles.
+   ======================================================================== */
+
+/* -- CoRa (Compliance Radar, Inc.) --------------------------------------
+   A full identity: navy ink, radar orange, warm cream ground, Montserrat
+   display over Figtree body. Extracted from the CoRa website package
+   (2026-09-24). Functional status and chart roles are NOT overridden.
+   Brand primitives are scoped to the brand block; semantic roles map them. */
+:root[data-brand="cora"] {
+  --cora-navy-1000: #021121; /* derived: navy-950 at 70% toward black */
+  --cora-navy-950: #03182f; --cora-navy-900: #0e1e33; --cora-navy-800: #0a2744;
+  --cora-navy-700: #063660; --cora-slate-700: #1f2f45; --cora-slate-500: #4b5a6b;
+  --cora-mist-300: #c2c8cd; /* derived: white 76% on navy-950 (source rgba) */
+  --cora-mist-500: #9aa3ac; /* derived: white 60% on navy-950 (source rgba) */
+  --cora-orange-700: #b35708; --cora-orange-500: #f68617;
+  --cora-orange-400: #ffa01c; --cora-orange-300: #ffc266;
+  --cora-cream-50: #fffbf5; --cora-cream-100: #f6eadb;
+  --cora-cream-200: #eadfcf; --cora-cream-300: #dccfbc; --cora-white: #ffffff;
+  --cora-peach-100: #fce3c6; /* source: hero glow */
+  --cora-font-display: 'Montserrat', 'Sora', -apple-system, 'Segoe UI', sans-serif;
+  --cora-font-body: 'Figtree', 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --font-display: var(--cora-font-display);
+  --font-body: var(--cora-font-body);
+
+  --color-bg: var(--cora-cream-50);
+  --color-bg-raised: var(--cora-white);
+  --color-bg-sunken: var(--cora-cream-100);
+  --color-bg-inverse: var(--cora-navy-950);
+  --color-text: var(--cora-navy-900);
+  --color-text-muted: var(--cora-slate-700);
+  --color-text-subtle: var(--cora-slate-500);
+  --color-text-inverse: var(--cora-white);
+  --color-border: var(--cora-cream-200);
+  --color-border-strong: var(--cora-cream-300);
+  --color-accent: var(--cora-orange-500);
+  --color-accent-hover: var(--cora-orange-400);
+  --color-on-accent: var(--cora-navy-950);
+  --color-focus-ring: var(--cora-orange-700); /* 4.76:1 on cream; orange-500 is 2.44:1 */
+  --color-link: var(--cora-navy-700);
+  --color-link-hover: var(--cora-orange-700);
+  --color-illo-line: var(--cora-navy-700);          --color-illo-accent: var(--cora-orange-500);
+  --color-illo-line-inverse: var(--cora-white);     --color-illo-accent-inverse: var(--cora-orange-400);
+  --color-illo-line-on-accent: var(--cora-navy-950); --color-illo-accent-on-accent: var(--cora-white);
+  --color-shader-back: var(--cora-cream-50);
+  --color-shader-1: var(--cora-peach-100);  --color-shader-2: var(--cora-orange-400);
+  --color-shader-3: var(--cora-orange-500); --color-shader-4: var(--cora-navy-700);
+  --color-hairline-hi: var(--cora-orange-500); --color-hairline-edge: var(--cora-slate-500); --color-hairline-mid: var(--cora-slate-500); --color-hairline-lo: var(--cora-mist-500);
+  --color-hairline-hi-inverse: var(--cora-orange-400); --color-hairline-edge-inverse: var(--cora-mist-500); --color-hairline-mid-inverse: var(--cora-mist-500); --color-hairline-lo-inverse: var(--cora-slate-500);
+  --color-hairline-hi-on-accent: var(--cora-white); --color-hairline-edge-on-accent: var(--cora-navy-700); --color-hairline-mid-on-accent: var(--cora-navy-700); --color-hairline-lo-on-accent: var(--cora-slate-500);
+}
+
+/* CoRa dark: system preference, then explicit opt-in. Same values. */
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="cora"]:not([data-theme="light"]) {
+    --color-bg: var(--cora-navy-950);
+    --color-bg-raised: var(--cora-navy-800);
+    --color-bg-sunken: var(--cora-navy-1000);
+    --color-bg-inverse: var(--cora-cream-50);
+    --color-text: var(--cora-white);
+    --color-text-muted: var(--cora-mist-300);
+    --color-text-subtle: var(--cora-mist-500);
+    --color-text-inverse: var(--cora-navy-950);
+    --color-border: rgba(255, 255, 255, 0.16);
+    --color-border-strong: rgba(255, 255, 255, 0.28);
+    --color-accent: var(--cora-orange-400);
+    --color-accent-hover: var(--cora-orange-300);
+    --color-on-accent: var(--cora-navy-950);
+    --color-focus-ring: var(--cora-orange-400);
+    --color-link: var(--cora-orange-400);
+    --color-link-hover: var(--cora-orange-300);
+    --color-illo-line: var(--cora-white);             --color-illo-accent: var(--cora-orange-400);
+    --color-illo-line-inverse: var(--cora-navy-700);  --color-illo-accent-inverse: var(--cora-orange-500);
+    --color-illo-line-on-accent: var(--cora-navy-950); --color-illo-accent-on-accent: var(--cora-white);
+    --color-shader-back: var(--cora-navy-950);
+    --color-shader-1: var(--cora-navy-800);   --color-shader-2: var(--cora-navy-700);
+    --color-shader-3: var(--cora-orange-500); --color-shader-4: var(--cora-orange-300);
+    --color-hairline-hi: var(--cora-orange-400); --color-hairline-edge: var(--cora-mist-500); --color-hairline-mid: var(--cora-mist-500); --color-hairline-lo: var(--cora-slate-500);
+    --color-hairline-hi-inverse: var(--cora-orange-500); --color-hairline-edge-inverse: var(--cora-slate-500); --color-hairline-mid-inverse: var(--cora-slate-500); --color-hairline-lo-inverse: var(--cora-mist-500);
+    --color-hairline-hi-on-accent: var(--cora-white); --color-hairline-edge-on-accent: var(--cora-navy-700); --color-hairline-mid-on-accent: var(--cora-navy-700); --color-hairline-lo-on-accent: var(--cora-slate-500);
+  }
+}
+:root[data-brand="cora"][data-theme="dark"],
+[data-brand="cora"] [data-theme="dark"] {
+  --color-bg: var(--cora-navy-950);
+  --color-bg-raised: var(--cora-navy-800);
+  --color-bg-sunken: var(--cora-navy-1000);
+  --color-bg-inverse: var(--cora-cream-50);
+  --color-text: var(--cora-white);
+  --color-text-muted: var(--cora-mist-300);
+  --color-text-subtle: var(--cora-mist-500);
+  --color-text-inverse: var(--cora-navy-950);
+  --color-border: rgba(255, 255, 255, 0.16);
+  --color-border-strong: rgba(255, 255, 255, 0.28);
+  --color-accent: var(--cora-orange-400);
+  --color-accent-hover: var(--cora-orange-300);
+  --color-on-accent: var(--cora-navy-950);
+  --color-focus-ring: var(--cora-orange-400);
+  --color-link: var(--cora-orange-400);
+  --color-link-hover: var(--cora-orange-300);
+  --color-illo-line: var(--cora-white);             --color-illo-accent: var(--cora-orange-400);
+  --color-illo-line-inverse: var(--cora-navy-700);  --color-illo-accent-inverse: var(--cora-orange-500);
+  --color-illo-line-on-accent: var(--cora-navy-950); --color-illo-accent-on-accent: var(--cora-white);
+  --color-shader-back: var(--cora-navy-950);
+  --color-shader-1: var(--cora-navy-800);   --color-shader-2: var(--cora-navy-700);
+  --color-shader-3: var(--cora-orange-500); --color-shader-4: var(--cora-orange-300);
+  --color-hairline-hi: var(--cora-orange-400); --color-hairline-edge: var(--cora-mist-500); --color-hairline-mid: var(--cora-mist-500); --color-hairline-lo: var(--cora-slate-500);
+  --color-hairline-hi-inverse: var(--cora-orange-500); --color-hairline-edge-inverse: var(--cora-slate-500); --color-hairline-mid-inverse: var(--cora-slate-500); --color-hairline-lo-inverse: var(--cora-mist-500);
+  --color-hairline-hi-on-accent: var(--cora-white); --color-hairline-edge-on-accent: var(--cora-navy-700); --color-hairline-mid-on-accent: var(--cora-navy-700); --color-hairline-lo-on-accent: var(--cora-slate-500);
+}
+
+/* -- DOE (Philippine Department of Energy, EVOSS) -----------------------
+   A full identity: the seal's blue and yellow on cool, seal-tinted neutrals,
+   Source Serif 4 display over Public Sans body. Ported from EVOSS UI v2
+   (2026-10-16). Laws carried over: seal yellow is a graphic color (rules,
+   dots, illustration and Hairline accents, the seal itself), never text and
+   never a large fill on a light ground; blue is brand, links, and actions.
+   Functional status and chart roles are NOT overridden. EVOSS itself is
+   light only; the dark theme here is derived on the navy ramp.
+   Brand primitives are scoped to the brand block; semantic roles map them. */
+:root[data-brand="doe"] {
+  --doe-seal-blue: #0038a8; --doe-seal-yellow: #fcd116;
+  --doe-navy-1000: #020917; /* derived: navy-950 at 60% toward black */
+  --doe-navy-950: #06173a; --doe-navy-900: #06255e; --doe-navy-800: #102b57;
+  --doe-blue-600: #1f4fb6; --doe-blue-400: #6f94d8;
+  --doe-blue-200: #b9cdef; --doe-blue-50: #eef3fc;
+  --doe-ink-950: #0e1a30; --doe-ink-700: #33415c; --doe-ink-500: #5b6880;
+  --doe-ink-450: #77839a; /* derived: form borders hold 3:1 on the page ground (ink-400 is 2.94:1) */
+  --doe-ink-400: #8691a4; --doe-ink-200: #d3d9e2; --doe-ink-75: #eef1f5; --doe-ink-50: #f4f6f9;
+  --doe-mist-50: #f2f5fa; --doe-mist-300: #b9c5d8;
+  --doe-mist-400: #9aa7be; /* derived: subtle text on navy, 5.7:1 on navy-800 */
+  --doe-white: #ffffff;
+  --doe-font-display: 'Source Serif 4', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  --doe-font-body: 'Public Sans', 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --font-display: var(--doe-font-display);
+  --font-body: var(--doe-font-body);
+
+  --color-bg: var(--doe-ink-50);
+  --color-bg-raised: var(--doe-white);
+  --color-bg-sunken: var(--doe-ink-75);
+  --color-bg-inverse: var(--doe-navy-800);
+  --color-text: var(--doe-ink-950);
+  --color-text-muted: var(--doe-ink-700);
+  --color-text-subtle: var(--doe-ink-500);
+  --color-text-inverse: var(--doe-mist-50);
+  --color-border: var(--doe-ink-200);
+  --color-border-strong: var(--doe-ink-450);
+  --color-accent: var(--doe-seal-blue);
+  --color-accent-hover: var(--doe-navy-900);
+  --color-on-accent: var(--doe-white);
+  --color-focus-ring: var(--doe-seal-blue);
+  --color-link: var(--doe-seal-blue);
+  --color-link-hover: var(--doe-navy-900);
+  --color-illo-line: var(--doe-ink-500);            --color-illo-accent: var(--doe-seal-blue);
+  --color-illo-line-inverse: var(--doe-mist-300);   --color-illo-accent-inverse: var(--doe-seal-yellow);
+  --color-illo-line-on-accent: var(--doe-blue-200); --color-illo-accent-on-accent: var(--doe-seal-yellow);
+  --color-shader-back: var(--doe-ink-50);
+  --color-shader-1: var(--doe-blue-50);     --color-shader-2: var(--doe-blue-200);
+  --color-shader-3: var(--doe-seal-blue);   --color-shader-4: var(--doe-navy-900);
+  --color-hairline-hi: var(--doe-seal-blue); --color-hairline-edge: var(--doe-ink-500); --color-hairline-mid: var(--doe-ink-500); --color-hairline-lo: var(--doe-ink-400);
+  --color-hairline-hi-inverse: var(--doe-seal-yellow); --color-hairline-edge-inverse: var(--doe-mist-400); --color-hairline-mid-inverse: var(--doe-mist-400); --color-hairline-lo-inverse: var(--doe-ink-500);
+  --color-hairline-hi-on-accent: var(--doe-seal-yellow); --color-hairline-edge-on-accent: var(--doe-blue-200); --color-hairline-mid-on-accent: var(--doe-blue-200); --color-hairline-lo-on-accent: var(--doe-blue-400);
+}
+
+/* DOE dark: system preference, then explicit opt-in. Same values. */
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="doe"]:not([data-theme="light"]) {
+    --color-bg: var(--doe-navy-950);
+    --color-bg-raised: var(--doe-navy-800);
+    --color-bg-sunken: var(--doe-navy-1000);
+    --color-bg-inverse: var(--doe-ink-50);
+    --color-text: var(--doe-mist-50);
+    --color-text-muted: var(--doe-mist-300);
+    --color-text-subtle: var(--doe-mist-400);
+    --color-text-inverse: var(--doe-navy-950);
+    --color-border: rgba(255, 255, 255, 0.16);
+    --color-border-strong: rgba(255, 255, 255, 0.34);
+    --color-accent: var(--doe-blue-400);
+    --color-accent-hover: var(--doe-blue-200);
+    --color-on-accent: var(--doe-navy-950);
+    --color-focus-ring: var(--doe-blue-200);
+    --color-link: var(--doe-blue-200);
+    --color-link-hover: var(--doe-white);
+    --color-illo-line: var(--doe-mist-300);          --color-illo-accent: var(--doe-seal-yellow);
+    --color-illo-line-inverse: var(--doe-ink-500);   --color-illo-accent-inverse: var(--doe-seal-blue);
+    --color-illo-line-on-accent: var(--doe-navy-950); --color-illo-accent-on-accent: var(--doe-white);
+    --color-shader-back: var(--doe-navy-950);
+    --color-shader-1: var(--doe-navy-800);   --color-shader-2: var(--doe-seal-blue);
+    --color-shader-3: var(--doe-blue-400);   --color-shader-4: var(--doe-blue-200);
+    --color-hairline-hi: var(--doe-seal-yellow); --color-hairline-edge: var(--doe-mist-400); --color-hairline-mid: var(--doe-mist-400); --color-hairline-lo: var(--doe-ink-500);
+    --color-hairline-hi-inverse: var(--doe-seal-blue); --color-hairline-edge-inverse: var(--doe-ink-500); --color-hairline-mid-inverse: var(--doe-ink-500); --color-hairline-lo-inverse: var(--doe-ink-400);
+    --color-hairline-hi-on-accent: var(--doe-white); --color-hairline-edge-on-accent: var(--doe-navy-900); --color-hairline-mid-on-accent: var(--doe-navy-900); --color-hairline-lo-on-accent: var(--doe-navy-800);
+  }
+}
+:root[data-brand="doe"][data-theme="dark"],
+[data-brand="doe"] [data-theme="dark"] {
+  --color-bg: var(--doe-navy-950);
+  --color-bg-raised: var(--doe-navy-800);
+  --color-bg-sunken: var(--doe-navy-1000);
+  --color-bg-inverse: var(--doe-ink-50);
+  --color-text: var(--doe-mist-50);
+  --color-text-muted: var(--doe-mist-300);
+  --color-text-subtle: var(--doe-mist-400);
+  --color-text-inverse: var(--doe-navy-950);
+  --color-border: rgba(255, 255, 255, 0.16);
+  --color-border-strong: rgba(255, 255, 255, 0.34);
+  --color-accent: var(--doe-blue-400);
+  --color-accent-hover: var(--doe-blue-200);
+  --color-on-accent: var(--doe-navy-950);
+  --color-focus-ring: var(--doe-blue-200);
+  --color-link: var(--doe-blue-200);
+  --color-link-hover: var(--doe-white);
+  --color-illo-line: var(--doe-mist-300);          --color-illo-accent: var(--doe-seal-yellow);
+  --color-illo-line-inverse: var(--doe-ink-500);   --color-illo-accent-inverse: var(--doe-seal-blue);
+  --color-illo-line-on-accent: var(--doe-navy-950); --color-illo-accent-on-accent: var(--doe-white);
+  --color-shader-back: var(--doe-navy-950);
+  --color-shader-1: var(--doe-navy-800);   --color-shader-2: var(--doe-seal-blue);
+  --color-shader-3: var(--doe-blue-400);   --color-shader-4: var(--doe-blue-200);
+  --color-hairline-hi: var(--doe-seal-yellow); --color-hairline-edge: var(--doe-mist-400); --color-hairline-mid: var(--doe-mist-400); --color-hairline-lo: var(--doe-ink-500);
+  --color-hairline-hi-inverse: var(--doe-seal-blue); --color-hairline-edge-inverse: var(--doe-ink-500); --color-hairline-mid-inverse: var(--doe-ink-500); --color-hairline-lo-inverse: var(--doe-ink-400);
+  --color-hairline-hi-on-accent: var(--doe-white); --color-hairline-edge-on-accent: var(--doe-navy-900); --color-hairline-mid-on-accent: var(--doe-navy-900); --color-hairline-lo-on-accent: var(--doe-navy-800);
+}
+
+/* Reduced motion: honour the OS setting everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
+}

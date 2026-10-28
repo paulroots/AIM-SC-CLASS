@@ -1,0 +1,46 @@
+/* Page-level layout for the lab console. Semantic tokens only; components come from byc.css. */
+
+.app { display: grid; grid-template-columns: 15rem 1fr; min-height: 100vh; }
+
+/* The rail is a dark subtree beside a light main column. */
+.rail { display: flex; flex-direction: column; background: var(--color-bg); border-right: var(--border-w) solid var(--color-border); }
+.rail .nav-rail { border-right: 0; flex: 1; }
+.rail .nav-item svg { width: 1rem; height: 1rem; flex: none; }
+.rail-head { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-5) var(--sp-5) var(--sp-3); }
+.rail-logo { height: 1.25rem; width: auto; align-self: flex-start; }
+.rail-foot { padding: var(--sp-4) var(--sp-5); font-size: var(--fs-11); color: var(--color-text-subtle); border-top: var(--border-w) solid var(--color-border); }
+
+.app-main { display: flex; flex-direction: column; gap: var(--sp-6); padding: var(--sp-6); min-width: 0; }
+.cb-subject { font-weight: var(--fw-medium); }
+
+.view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
+.view-head .stack > * + * { margin-top: var(--sp-1); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+.two-col > *, .panel, .proof { min-width: 0; }
+/* Hashes and addresses are shown in full; let them wrap rather than widen the page. */
+.timeline-body .mono, .detail-list dd.mono, .proof-foot span:last-child, .hint.mono { overflow-wrap: anywhere; }
+.proof-foot span:last-child { min-width: 0; }
+.panel-body .stack > * + * { margin-top: var(--sp-4); }
+.panel-body .cluster { gap: var(--sp-2); }
+.table-frame { overflow-x: auto; }
+.hash { max-width: 100%; }
+.value-row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.account { display: inline-flex; align-items: center; gap: var(--sp-2); font-family: var(--font-mono); font-size: var(--fs-13); }
+.hidden { display: none !important; }
+
+@media (max-width: 1024px) {
+  .app { grid-template-columns: 1fr; }
+  .rail { border-right: 0; border-bottom: var(--border-w) solid var(--color-border); }
+  .rail .nav-rail { flex-direction: row; flex-wrap: wrap; }
+  .two-col { grid-template-columns: 1fr; }
+  .metric-strip { grid-auto-flow: row; grid-template-columns: 1fr 1fr; }
+  .metric { border-left: 0; border-top: var(--border-w) solid var(--color-border); }
+}
+@media (max-width: 640px) {
+  .app-main { padding: var(--sp-4); }
+  .metric-strip { grid-template-columns: 1fr; }
+  .classification-bar { flex-wrap: wrap; row-gap: var(--sp-1); }
+  .classification-bar .cb-meta { flex-basis: 100%; }
+  .detail-list { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,3 @@
+# One student wallet address per line. Copy to students.txt (which is gitignored).
+# Anything after the address on a line is ignored, so you can add names.
+0x0000000000000000000000000000000000000001  Example Student
