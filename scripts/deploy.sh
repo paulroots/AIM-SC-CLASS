@@ -9,7 +9,10 @@
 NETWORK="${NETWORK:-local}"
 CONTRACT="${CONTRACT:-Counter}"
 resolve_network "$NETWORK"
-require_private_key
+# The deploy script reads PRIVATE_KEY, so point it at the right signer for this network.
+PRIVATE_KEY="$(signer_key "$NETWORK")"
+export PRIVATE_KEY
+echo "Signer $(cast wallet address --private-key "$PRIVATE_KEY")"
 
 SCRIPT_FILE="script/${CONTRACT}.s.sol"
 [ -f "$SCRIPT_FILE" ] || { echo "No deploy script at $SCRIPT_FILE" >&2; exit 1; }

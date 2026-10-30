@@ -25,20 +25,26 @@ echo
 echo "Project"
 if [ -d lib/forge-std/src ]; then ok "forge-std installed"; else fail "forge-std missing. Run: make install"; status=1; fi
 if [ -f .env ]; then ok ".env present"; else warn ".env missing. Copy .env.example to .env (fine for local-only work until you deploy)"; fi
-if [ -n "${PRIVATE_KEY:-}" ]; then
-  if addr="$(cast wallet address --private-key "$PRIVATE_KEY" 2>/dev/null)"; then
-    ok "PRIVATE_KEY resolves to $addr"
-  else
-    fail "PRIVATE_KEY is set but invalid"; status=1
-  fi
+local_addr=""; prismo_addr=""
+if local_addr="$(cast wallet address --private-key "$LOCAL_PRIVATE_KEY" 2>/dev/null)"; then
+  ok "local signer $local_addr"
 else
-  warn "PRIVATE_KEY not set"
+  fail "LOCAL_PRIVATE_KEY is invalid"; status=1
+fi
+if [ -z "${PRIVATE_KEY:-}" ]; then
+  warn "PRIVATE_KEY not set. Needed only for Prismo (README, section 5)"
+elif [ "$(echo "$PRIVATE_KEY" | tr '[:upper:]' '[:lower:]')" = "$ANVIL_KEY0" ]; then
+  warn "PRIVATE_KEY is Anvil's public test key. Use your own wallet before deploying to Prismo"
+elif prismo_addr="$(cast wallet address --private-key "$PRIVATE_KEY" 2>/dev/null)"; then
+  ok "Prismo signer $prismo_addr"
+else
+  fail "PRIVATE_KEY is set but invalid"; status=1
 fi
 
 echo
 echo "Networks"
 check_rpc() {
-  local name="$1" url="$2" expected="$3"
+  local name="$1" url="$2" expected="$3" addr="$4"
   local got
   got="$(cast chain-id --rpc-url "$url" 2>/dev/null || true)"
   if [ -z "$got" ]; then
@@ -46,14 +52,18 @@ check_rpc() {
     return
   fi
   if [ "$got" = "$expected" ]; then ok "$name chain id $got"; else fail "$name returned chain id $got, expected $expected"; status=1; fi
-  if [ -n "${PRIVATE_KEY:-}" ] && [ -n "${addr:-}" ]; then
+  if [ -n "$addr" ]; then
     local bal
     bal="$(cast balance --rpc-url "$url" --ether "$addr" 2>/dev/null || echo "?")"
-    if [ "$bal" = "0" ] || [ "$bal" = "0.000000000000000000" ]; then warn "$name balance of $addr is 0. Ask the instructor for gas."; else ok "$name balance $bal"; fi
+    if [ "$bal" = "0" ] || [ "$bal" = "0.000000000000000000" ]; then
+      if [ "$name" = "prismo" ]; then warn "prismo balance of $addr is 0. Request USDC at $PRISMO_FAUCET"; else warn "$name balance of $addr is 0"; fi
+    else
+      ok "$name balance $bal"
+    fi
   fi
 }
-check_rpc local "$LOCAL_RPC_URL" "$LOCAL_CHAIN_ID"
-check_rpc prismo "$PRISMO_RPC_URL" "$PRISMO_CHAIN_ID"
+check_rpc local "$LOCAL_RPC_URL" "$LOCAL_CHAIN_ID" "$local_addr"
+check_rpc prismo "$PRISMO_RPC_URL" "$PRISMO_CHAIN_ID" "$prismo_addr"
 
 echo
 if [ "$status" -eq 0 ]; then echo "All required checks passed."; else echo "Fix the [fail] items above, then run make doctor again."; fi

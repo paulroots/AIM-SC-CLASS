@@ -10,6 +10,9 @@ Everything the students do not need to see. Keep this file out of the student zi
 
 ## Funding students
 
+Students fund themselves at https://faucet.glassnet.prismo.network/: 1 USDC per address every 24 hours behind an hCaptcha, or 10 USDC per hour for anyone who signs in with a Prismo team Microsoft account. One Counter deploy costs about 0.00025 USDC, so the public tier is plenty. Use the script below only as a fallback when the faucet is down or a student is blocked.
+
+
 Collect each student's Prismo address (a fresh MetaMask account), one per line, in `students.txt`:
 
 ```
@@ -48,6 +51,8 @@ The script skips anyone already holding at least the amount, so it is safe to re
 
 - cdk-erigon client built `no-typed-tx`: EIP-1559 transactions are rejected. Always `--legacy`. MetaMask detects this itself.
 - Shanghai EVM (PUSH0 works). `foundry.toml` pins `evm_version = "shanghai"` and solc 0.8.28, matching the contracts already verified on the explorer.
+- Faucet: https://faucet.glassnet.prismo.network/ (public tier 1 USDC/24h with hCaptcha; team tier 10 USDC/1h via Microsoft sign-in). It has no captcha-free API, so it cannot be scripted.
+- Signers: local deploys use `LOCAL_PRIVATE_KEY` (Anvil #0 by default); Prismo deploys use `PRIVATE_KEY`, and `scripts/common.sh` refuses Anvil's public key there.
 - Gas price floor is 1 gwei. Gas token is USDC-denominated with 18 decimals.
 - Blockscout explorer; `forge verify-contract --verifier blockscout --verifier-url https://explorer.glassnet.prismo.network/api` works without an API key.
 - RPC allows cross-origin requests, so the pages read directly from it without a wallet.

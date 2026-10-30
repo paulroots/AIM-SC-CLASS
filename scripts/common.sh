@@ -8,10 +8,13 @@ cd "$ROOT"
 
 # Load .env if present. Variables already set in the shell win.
 if [ -f .env ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . ./.env
-  set +a
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ''|\#*) continue ;; esac
+    key="${line%%=*}"; val="${line#*=}"
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    val="${val%\"}"; val="${val#\"}"
+    if [ -z "${!key+x}" ]; then export "$key=$val"; fi
+  done < .env
 fi
 
 LOCAL_RPC_URL="${LOCAL_RPC_URL:-http://127.0.0.1:8545}"
@@ -32,11 +35,35 @@ resolve_network() {
   esac
 }
 
-require_private_key() {
+PRISMO_FAUCET="https://faucet.glassnet.prismo.network/"
+
+# Anvil account #0. Its key is printed by every Anvil install, so it is public:
+# fine on the local chain, never acceptable on Prismo.
+ANVIL_KEY0="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+LOCAL_PRIVATE_KEY="${LOCAL_PRIVATE_KEY:-$ANVIL_KEY0}"
+
+# signer_key <local|prismo> prints the key that signs on that network.
+#   local  -> LOCAL_PRIVATE_KEY (defaults to Anvil account #0, which Anvil funds)
+#   prismo -> PRIVATE_KEY (your own wallet, funded from the faucet)
+signer_key() {
+  if [ "${1:-local}" = "local" ]; then
+    printf '%s' "$LOCAL_PRIVATE_KEY"
+    return
+  fi
   if [ -z "${PRIVATE_KEY:-}" ]; then
-    echo "PRIVATE_KEY is not set. Copy .env.example to .env and fill it in." >&2
+    echo "PRIVATE_KEY is not set. Put your own wallet's key in .env (see README, section 5)." >&2
     exit 1
   fi
+  if [ "$(echo "$PRIVATE_KEY" | tr '[:upper:]' '[:lower:]')" = "$ANVIL_KEY0" ]; then
+    echo "PRIVATE_KEY is Anvil's public test key. Anyone can spend from it on Prismo." >&2
+    echo "Create a fresh MetaMask account and put its key in .env instead." >&2
+    exit 1
+  fi
+  printf '%s' "$PRIVATE_KEY"
+}
+
+require_private_key() {
+  signer_key prismo >/dev/null
 }
 
 ok()   { printf '  \033[32m[ok]\033[0m   %s\n' "$*"; }

@@ -32,7 +32,7 @@ Open a terminal and leave it running:
 make anvil
 ```
 
-Anvil prints ten funded accounts with their private keys. Account #0 is already in `.env.example`. Import that private key into MetaMask (Account menu, Import account) and add the Anvil network (the Overview page has an "Add to wallet" button, or add it by hand: RPC `http://127.0.0.1:8545`, chain id `31337`).
+Anvil prints ten funded accounts with their private keys. Local deploys sign with account #0 (`LOCAL_PRIVATE_KEY` in `.env`), so they work with no setup. Import that private key into MetaMask (Account menu, Import account) and add the Anvil network (the Overview page has an "Add to wallet" button, or add it by hand: RPC `http://127.0.0.1:8545`, chain id `31337`).
 
 ## 3. Build, test, deploy
 
@@ -63,12 +63,13 @@ Prismo Glassnet is a public zkRollup testnet (Polygon CDK). Facts you will need:
 | Chain id | `101001000` |
 | Explorer | https://explorer.glassnet.prismo.network |
 | Gas token | USDC (test units, no value) |
+| Faucet | https://faucet.glassnet.prismo.network/ (1 USDC per 24h, enough for thousands of deploys) |
 
 Steps:
 
 1. Create a fresh account in MetaMask for class. Never reuse a wallet that holds real funds.
-2. Give your instructor the account's address. They will send you test gas. Check with `make doctor`.
-3. Export that account's private key from MetaMask and put it in `.env` as `PRIVATE_KEY`.
+2. Paste the account's address into the faucet at https://faucet.glassnet.prismo.network/, solve the captcha, and press Request USDC. If the faucet is dry or rate-limited, give the address to your instructor instead.
+3. Export that account's private key from MetaMask and put it in `.env` as `PRIVATE_KEY`. Run `make doctor`; it shows your Prismo balance. The scripts refuse to use Anvil's public key on Prismo.
 4. Deploy and verify:
 
 ```sh
