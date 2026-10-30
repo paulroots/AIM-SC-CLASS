@@ -4,9 +4,80 @@ Everything the students do not need to see. Keep this file out of the student zi
 
 ## Before the first session
 
-1. Run `make doctor` on the teaching machine with the owner key in `.env`. The owner wallet is `0xdC1d3B6FEadB5349efe46B067E105682a5FE9019` on Prismo Glassnet. It held about 1,631 gas units on 2026-10-28.
-2. Deploy Counter to Prismo once from your own machine so the explorer link exists for the slides: `make deploy NETWORK=prismo CONTRACT=Counter` then `make verify CONTRACT=Counter`.
+1. Run `make doctor` on the teaching machine. Your `.env` holds the class deployer key (`0x40ecDde30e4ddAD023b1D585928f2036015281fF`, funded from the faucet). Top it up at https://faucet.glassnet.prismo.network/ if `make doctor` shows a low Prismo balance.
+2. Counter is already deployed and verified on Prismo for the slides. See the reference deployment below. Redeploy only if you want a fresh address.
 3. Package the kit: `make zip`. Hand out `aim-smart-contracts-kit.zip` or push the repo and share the URL.
+
+## Live demo: deploy a Hello World contract
+
+About 15 minutes. Rehearsed end to end on 2026-10-30. `make new-dapp` generates a contract that stores a message, which is exactly a Hello World.
+
+### Setup before students arrive
+
+Open three terminals in the project folder and MetaMask in the browser, connected to Anvil with account #0 imported.
+
+```sh
+make anvil     # terminal 1, leave it open
+make dapp      # terminal 2, leave it open
+               # terminal 3 is for the demo
+```
+
+Open http://localhost:3000 (four zeros). If you have run this demo before, reset it first (see the end of this section).
+
+### Steps
+
+1. **Create the contract.**
+   ```sh
+   make new-dapp NAME=HelloWorld
+   ```
+   Open `src/HelloWorld.sol`. Walk through `message`, the immutable `owner`, `setMessage`, and the `MessageChanged` event.
+
+2. **Write the greeting.** In `script/HelloWorld.s.sol`, change the constructor argument while students watch:
+   ```solidity
+   deployed = new HelloWorld("Hello, World!");
+   ```
+
+3. **Test it.**
+   ```sh
+   forge test --match-contract HelloWorldTest -vv
+   ```
+   Two tests pass: the constructor stores the message, and `setMessage` updates it and emits the event.
+
+4. **Deploy locally.**
+   ```sh
+   make deploy NETWORK=local CONTRACT=HelloWorld
+   ```
+   Show the printed address and the new entry in `web/deployments.json`.
+
+5. **Read it from the terminal.**
+   ```sh
+   cast call <address> "message()(string)" --rpc-url http://127.0.0.1:8545
+   ```
+   Prints `"Hello, World!"`.
+
+6. **Use it in the browser.** Reload http://localhost:3000. HelloWorld appears in the rail. Its page shows the message and owner and a `setMessage` form. Send "Hello, AIM!", confirm in MetaMask, and show the message change and the `MessageChanged` entry in the event log.
+
+7. **Deploy to Prismo Glassnet and verify.** The deploy signs with `PRIVATE_KEY` from `.env`.
+   ```sh
+   make deploy NETWORK=prismo CONTRACT=HelloWorld
+   CONSTRUCTOR_ARGS=$(cast abi-encode 'constructor(string)' "Hello, World!") make verify CONTRACT=HelloWorld
+   ```
+   Open the printed explorer link. Show the transaction, the verified source, and `message` under Read Contract. The point to land: anyone in the world can now read this contract.
+
+### Things to know
+
+- The string in `CONSTRUCTOR_ARGS` must match the deploy script exactly, or verification fails.
+- Every Prismo deploy is public and permanent. Each costs about 0.0003 USDC.
+- If MetaMask hangs or reports a nonce error after Anvil was restarted, clear its activity data (Settings, Advanced, Clear activity tab data) and redeploy locally.
+
+### Reset to run the demo again
+
+`make new-dapp` refuses to overwrite existing files. Remove the generated files and the rail entry:
+
+```sh
+rm -r src/HelloWorld.sol script/HelloWorld.s.sol test/HelloWorld.t.sol web/helloworld
+node -e 'const f="web/shared/dapps.json",fs=require("fs");fs.writeFileSync(f,JSON.stringify(JSON.parse(fs.readFileSync(f)).filter(d=>d.contract!=="HelloWorld"),null,2)+"\n")'
+```
 
 ## Reference deployment on Prismo Glassnet
 
@@ -52,7 +123,7 @@ The script skips anyone already holding at least the amount, so it is safe to re
 | 25 to 40 | Tests: assertions, `vm.prank`, `vm.expectRevert`, `vm.expectEmit`, fuzzing | `make test`, then `forge test --match-test test_decrement_revertsAtZero -vvvv` |
 | 40 to 55 | Local deploy and the dApp. Show `broadcast/` and `web/deployments.json` | `make anvil`, `make deploy NETWORK=local`, `make dapp` |
 | 55 to 75 | Prismo deploy and verification. Walk the explorer: tx, logs, verified source | `make deploy NETWORK=prismo`, `make verify` |
-| 75 to 90 | Scaffold a new dApp live, change the contract, redeploy | `make new-dapp NAME=Greeter` |
+| 75 to 90 | Hello World live demo (section above): scaffold, test, deploy local, then Prismo | `make new-dapp NAME=HelloWorld` |
 
 ## How the pieces fit
 
