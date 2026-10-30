@@ -8,6 +8,20 @@ Everything the students do not need to see. Keep this file out of the student zi
 2. Deploy Counter to Prismo once from your own machine so the explorer link exists for the slides: `make deploy NETWORK=prismo CONTRACT=Counter` then `make verify CONTRACT=Counter`.
 3. Package the kit: `make zip`. Hand out `aim-smart-contracts-kit.zip` or push the repo and share the URL.
 
+## Reference deployment on Prismo Glassnet
+
+Counter was deployed and verified on 2026-10-30 for use in slides and live demos.
+
+| | |
+| --- | --- |
+| Contract | `0x9fA9d890993e026A2e97098A8A3D2a5718858841` |
+| Deploy tx | `0xf8690bcbc5579eb00cc5b18ac2201818895ac3fec70b2d9addebf9233b8562a2` |
+| First increment tx | `0x232b04d67f42fad9ce09cf594f43155ac1080618fe48884345b27f6f2f65b4ce` (block 2555699) |
+| Owner and deployer | `0x40ecDde30e4ddAD023b1D585928f2036015281fF` (key in your local `.env` only) |
+| Verified source | https://explorer.glassnet.prismo.network/address/0x9fa9d890993e026a2e97098a8a3d2a5718858841?tab=contract |
+
+The deployer is the only account that can call `setNumber`. Anyone can call `increment` and `decrement`.
+
 ## Funding students
 
 Students fund themselves at https://faucet.glassnet.prismo.network/: 1 USDC per address every 24 hours behind an hCaptcha, or 10 USDC per hour for anyone who signs in with a Prismo team Microsoft account. One Counter deploy costs about 0.00025 USDC, so the public tier is plenty. Use the script below only as a fallback when the faucet is down or a student is blocked.
