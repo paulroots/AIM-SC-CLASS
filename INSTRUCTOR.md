@@ -79,6 +79,70 @@ rm -r src/HelloWorld.sol script/HelloWorld.s.sol test/HelloWorld.t.sol web/hello
 node -e 'const f="web/shared/dapps.json",fs=require("fs");fs.writeFileSync(f,JSON.stringify(JSON.parse(fs.readFileSync(f)).filter(d=>d.contract!=="HelloWorld"),null,2)+"\n")'
 ```
 
+## Live demo: decentralized identity (Session 15)
+
+About 20 minutes. A university issues a degree credential, a student holds it, and an employer verifies it without contacting the university. Then the university rotates a key and revokes the credential. Rehearsed end to end on a local chain on 2026-10-30; rehearse once on Prismo before class.
+
+Two contracts back it. `src/DIDRegistry.sol` is a teaching copy of the ERC-1056 registry behind `did:ethr` (same function and event signatures, without the signed meta-transaction variants and attributes). `src/StatusList.sol` is an on-chain revocation bitstring; only the issuer's current controller in the registry may flip its bits. `scripts/did-demo.sh` drives every step with `cast`, so there is nothing to install.
+
+### Setup before students arrive
+
+Open the animation `Lesson/did-flow.html` in the browser. It shows the same story in 11 steps (arrows to step, Space to play). Use it to introduce each beat, then run the matching command.
+
+Deploy the two contracts once. On Prismo this signs with `PRIVATE_KEY` from `.env`, which also plays the university:
+
+```sh
+make did STEP=setup NETWORK=prismo
+make verify CONTRACT=DIDRegistry
+make verify CONTRACT=StatusList
+```
+
+`setup` prints the cast: the university's DID (`did:ethr:0x6052728:<your address>`), a freshly generated student DID, and a note that the employer needs no DID at all. To rehearse locally instead, leave `NETWORK` off and keep `make anvil` running.
+
+### Steps
+
+Add `NETWORK=prismo` to every command when running on Prismo.
+
+1. **Every address is a DID.** `make did STEP=resolve`
+   Prints the university's DID document and its registry history, which is empty. Land the point: creating a DID costs nothing and needs no transaction.
+
+2. **Issue.** `make did STEP=issue`
+   Prints the credential's header, claims (name, degree, status list index) and signature, and saves it to `did-demo/<chainId>/credential.jwt`. No transaction was sent: the credential lives with the student, not on the chain.
+
+3. **Verify.** `make did STEP=verify`
+   The employer resolves the issuer's DID from the registry, checks the signature against the key it finds, and reads the revocation bit. Three green checks, `VALID`, and "university contacted: no".
+
+4. **Tamper.** `make did STEP=tamper`
+   Changes the degree from BSc to PhD, keeps the original signature, and verifies again. The key is found but the signature fails: `REJECTED`.
+
+5. **Rotate a key.** `make did STEP=rotate`
+   Sends `addDelegate` to the registry (show it on the explorer), issues `credential-2.jwt` signed with the new key, prints the DID document with two keys and the history with the block number, and verifies the new credential: `VALID`.
+
+6. **Retire the key.** `make did STEP=retire`
+   Sends `revokeDelegate` for that key and verifies `credential-2.jwt` again. The key is no longer in the DID document: `REJECTED`. This is the threats slide in one command: key management is the real security boundary.
+
+7. **Revoke the credential.** `make did STEP=revoke`
+   Flips the original credential's bit in the status list (show the transaction on the explorer) and verifies again. Key and signature still pass, but the status check fails: `REJECTED`. Point out that the list is shared by every credential the university issues, which is where herd privacy comes from.
+
+`make did STEP=resolve` at any point shows the current DID document and the full history; each change names the block of the change before it.
+
+### Things to know
+
+- The credentials are JWTs signed with Ethereum `personal_sign` (EIP-191) so `cast` can sign and check them. The header says `"alg": "EIP191"`. Real wallets use ES256K or EdDSA through libraries such as `did-jwt-vc`; the structure and the resolve-then-verify flow are the same. Say this if a student asks whether the format is standard.
+- The DID documents use the `did:ethr` shape (`EcdsaSecp256k1RecoveryMethod2020`, `blockchainAccountId`, `#controller`, `#delegate-N`), so they match what a standard resolver returns for the same registry.
+- Selective disclosure (SD-JWT, zero-knowledge proofs) is not part of the demo. Keep it on the slide.
+- On Prismo, `setup` makes two deploys and `rotate`, `retire` and `revoke` one transaction each. All are public and permanent, and together cost well under 0.01 USDC.
+- Custom claims: `HOLDER_NAME="Maria Reyes" DEGREE="Master of Science in Cybersecurity" make did STEP=issue`.
+- A specific file: `make did STEP=verify ARG=did-demo/101001000/credential-2.jwt`.
+
+### Reset to run the demo again
+
+```sh
+make did STEP=reset NETWORK=prismo   # forgets the student and the credentials; the contracts stay
+```
+
+Then start again from step 1; `issue` creates a new student. The registry still remembers the earlier key changes, and they show in `resolve`. For an empty history, run `make did STEP=setup NETWORK=prismo` again to deploy fresh contracts.
+
 ## Reference deployment on Prismo Glassnet
 
 Counter was deployed and verified on 2026-10-30 for use in slides and live demos.
@@ -131,6 +195,21 @@ The script skips anyone already holding at least the amount, so it is safe to re
 - `web/shared/chains.js` is the only place network facts live on the web side; `scripts/common.sh` is the only place on the shell side.
 - `web/shared/shell.js` draws the rail and classification bar. `web/shared/abi-ui.js` is the generic ABI console used by generated pages. `web/counter/index.html` is hand-written on purpose so students can read a complete dApp top to bottom.
 - `templates/` holds what `make new-dapp` copies; `__NAME__` and `__name__` are the placeholders.
+- `scripts/did-demo.sh` (behind `make did`) builds DID documents the way a `did:ethr` resolver does: the controller from `identityOwner()`, plus every unexpired `veriKey` delegate found in the registry's `DIDDelegateChanged` events. Its state (student address, credentials, the rotated signing key) lives in `did-demo/<chainId>/`, which is gitignored and left out of `make zip`.
+- `make verify` fills in constructor arguments for Counter and for StatusList (the DIDRegistry address from `web/deployments.json`). DIDRegistry takes none.
+
+## Lesson pages
+
+The `Lesson/` folder holds the slide decks and the pages that go with them. They are plain HTML; open them straight from the folder.
+
+| File | What it is |
+| --- | --- |
+| `instructor-guide.html` | Your talking points for Sessions 13 to 16 in deck order, with the wallet, Hello World and DID demos in place. Tick cards off as you go; A+ enlarges the text. |
+| `session-13` to `session-16-*.html` | The motion decks. Arrows step, N shows speaker notes, K shows plain-language key terms for the scene on screen. |
+| `descriptions.html` | Key Terms glossary: every term from Sessions 13 to 16, with a definition and a plain-language explanation. |
+| `student-lab.html` | Hand this to students during the 90-minute lab: what you will do in each block and what to watch for. They do not type anything. |
+| `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write). |
+| `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate and revoke a credential. Pairs with `make did`. |
 
 ## Prismo Glassnet facts (verified 2026-10-28)
 
@@ -152,4 +231,5 @@ The pages use the Lumen design system (private repo `byc-product/lumen-design-sy
 - Windows students must use WSL2. Budget time for it in session one.
 - A restarted Anvil invalidates MetaMask's nonce cache. Students must clear activity data in MetaMask or transactions will hang.
 - `make new-dapp` registers the page in `web/shared/dapps.json`. Deleting a generated dApp means removing its four files and that entry.
-- `make verify` for a generated contract needs `CONSTRUCTOR_ARGS` to match the deploy script. Counter is handled automatically.
+- `make verify` for a generated contract needs `CONSTRUCTOR_ARGS` to match the deploy script. Counter and StatusList are handled automatically.
+- The decks and their key-terms panels describe Sepolia; the kit and the animations use Prismo Glassnet. Mention it when you switch from slides to the terminal.

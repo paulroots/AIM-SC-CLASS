@@ -1,0 +1,941 @@
+```html
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Terms · Sessions 13–16</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   Lumen Design System: Token Layer (Dark Theme Default)
+   ============================================================================ */
+:root {
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-12: 0.75rem; --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem;
+  --fs-20: 1.25rem; --fs-24: 1.5rem; --fs-36: 2.25rem;
+
+  --lh-tight: 1.1; --lh-normal: 1.5;
+  --tr-eyebrow: 0.08em;
+
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-400);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+  --color-accent-hover: var(--ink-200);
+
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ledger texture backdrop matching session style */
+body {
+  background: 
+    linear-gradient(90deg, transparent 88px, color-mix(in srgb, var(--color-text) 6%, transparent) 88px 89px, transparent 89px 94px, color-mix(in srgb, var(--color-text) 6%, transparent) 94px 95px, transparent 95px),
+    repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--color-text) 6%, transparent) 39px 40px),
+    var(--color-bg);
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 100%;
+  max-width: 48rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  border: var(--border-w, 1px) solid var(--color-border-strong);
+  background: var(--color-bg-raised);
+  padding: 2.5rem;
+  position: relative;
+}
+
+.card-eyebrow {
+  font: var(--fw-regular) var(--fs-14) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-36);
+  letter-spacing: -0.04em;
+  line-height: var(--lh-tight);
+  margin: 0 0 1rem 0;
+  color: var(--color-text);
+}
+
+.card-body {
+  font-size: var(--fs-18);
+  line-height: var(--lh-normal);
+  color: var(--color-text-muted);
+  margin: 0 0 2rem 0;
+}
+
+.card-label {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  margin: 0 0 0.5rem 0;
+}
+
+.card-body + .card-label { margin-top: -0.75rem; }
+
+.card-body.lead { color: var(--color-text); margin-bottom: 2rem; }
+
+@media (max-width: 40rem) {
+  body { padding: 1rem; }
+  .card { padding: 1.5rem; }
+  .card-title { font-size: var(--fs-24); }
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
+  font: var(--fw-regular) var(--fs-14) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.deck-tag {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  border: 1px solid var(--color-border-strong);
+  padding: 0.25rem 0.75rem;
+  color: var(--color-text);
+}
+
+.page-head { padding-bottom: 1rem; border-bottom: 1px solid var(--color-border-strong); }
+
+.page-title {
+  font-weight: var(--fw-black);
+  font-size: var(--fs-36);
+  letter-spacing: -0.04em;
+  line-height: var(--lh-tight);
+  margin: 0 0 1.5rem 0;
+}
+
+.toc { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.toc a {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-decoration: none;
+  border: 1px solid var(--color-border-strong);
+  padding: 0.375rem 0.75rem;
+}
+
+.toc a:hover { border-color: var(--color-accent); }
+
+.session { display: flex; flex-direction: column; gap: 2rem; scroll-margin-top: 2rem; }
+
+.session-title {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-24);
+  letter-spacing: -0.02em;
+  margin: 2rem 0 0 0;
+}
+
+.session-title span {
+  display: block;
+  font: var(--fw-regular) var(--fs-14) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  margin-bottom: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="page-head">
+      <div class="card-eyebrow">Sessions 13 to 16 · Glossary</div>
+      <h1 class="page-title">Key Terms</h1>
+      <nav class="toc"><a href="#s13">13 · Blockchain 101</a><a href="#s14">14 · Solidity: Deploy and Interact</a><a href="#s15">15 · Digital Identity</a><a href="#s16">16 · Gas and Q&amp;A</a></nav>
+    </header>
+
+    <section class="session" id="s13">
+      <h2 class="session-title"><span>Session 13</span>Blockchain 101</h2>
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 01</div>
+        <h3 class="card-title">Blockchain</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A ledger copied across many independent computers, where anyone can check the history and no single party can rewrite it without being caught.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of a shared notebook that everyone in a group keeps an identical copy of. Anyone can read back through it, and if one person secretly changes an old page, everyone else’s copies expose the mismatch.</p>
+        <div class="card-footer">
+          <span>01 / 16</span>
+          <span class="deck-tag">Foundations</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 02</div>
+        <h3 class="card-title">Double-Spending</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Spending the same digital money twice by signing two payments with the same coins. The network must agree which one counts.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Digital money is just data, and data can be copied. Without a referee you could hand the same digital banknote to two shops. A blockchain is the referee that decides which payment came first.</p>
+        <div class="card-footer">
+          <span>02 / 16</span>
+          <span class="deck-tag">Foundations</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 03</div>
+        <h3 class="card-title">Hash Function (SHA-256, Keccak-256)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A function that turns any input, of any size, into a fixed 256-bit output. It is deterministic, infeasible to reverse, and collision resistant. Bitcoin uses SHA-256; Ethereum uses Keccak-256.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A hash is a fingerprint machine for data. Put in one word or a whole film and you get a fingerprint of the same size. The same input always gives the same fingerprint, and you cannot rebuild the input from it.</p>
+        <div class="card-footer">
+          <span>03 / 16</span>
+          <span class="deck-tag">Cryptography</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 04</div>
+        <h3 class="card-title">Avalanche Effect</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Flipping a single input bit changes about half of the output bits of a hash.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Change one comma in a document and its fingerprint looks completely different, not slightly different. You cannot quietly nudge a record and keep its fingerprint.</p>
+        <div class="card-footer">
+          <span>04 / 16</span>
+          <span class="deck-tag">Cryptography</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 05</div>
+        <h3 class="card-title">Merkle Tree &amp; Merkle Root</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Transactions are hashed in pairs, then the pairs are hashed, up to one root hash that commits to every transaction in the block.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of a tournament bracket for fingerprints. Pairs combine round by round until one winner remains. Change any single transaction and the final winner changes too.</p>
+        <div class="card-footer">
+          <span>05 / 16</span>
+          <span class="deck-tag">Data Structure</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 06</div>
+        <h3 class="card-title">Block</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The unit of ordering. Each block has a height, a timestamp and an ordered list of transactions, is identified by its own hash, and stores the hash of the block before it.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A block is a numbered page in the ledger. Each page lists transactions in order and writes the fingerprint of the previous page at the top, which chains the pages together all the way back to the first one, the genesis block.</p>
+        <div class="card-footer">
+          <span>06 / 16</span>
+          <span class="deck-tag">Data Structure</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 07</div>
+        <h3 class="card-title">Mempool</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The public waiting room where nodes hold signed, checked transactions until a block includes them.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The mempool is a queue at a counter, except the queue is in a glass room. Everyone can see what you are about to do before it happens, which is the root of front-running.</p>
+        <div class="card-footer">
+          <span>07 / 16</span>
+          <span class="deck-tag">Transactions</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 08</div>
+        <h3 class="card-title">Consensus</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The rule that decides who adds the next block and why everyone else should accept it.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Consensus is the group’s agreement on whose turn it is to write the next page of the notebook, so that every copy stays the same.</p>
+        <div class="card-footer">
+          <span>08 / 16</span>
+          <span class="deck-tag">Consensus</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 09</div>
+        <h3 class="card-title">Proof of Work</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Used by Bitcoin. Proposers solve a costly hash puzzle to win the right to add a block. Rewriting history means redoing that work faster than the honest network.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The right to write the next page goes to whoever wins an expensive guessing contest. Rewriting old pages means paying for all of those contests again, faster than everyone else combined.</p>
+        <div class="card-footer">
+          <span>09 / 16</span>
+          <span class="deck-tag">Consensus</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 10</div>
+        <h3 class="card-title">Proof of Stake</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Used by Ethereum since the Merge in September 2022. Validators lock at least 32 ETH as collateral, and the protocol slashes that stake if they sign two conflicting blocks.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Validators put down a large deposit to take part. Play fair and you earn rewards; cheat and the deposit is confiscated. Security comes from money at risk instead of electricity.</p>
+        <div class="card-footer">
+          <span>10 / 16</span>
+          <span class="deck-tag">Consensus</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 11</div>
+        <h3 class="card-title">Finality</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">On Ethereum, a validator proposes a block in each 12-second slot. After two epochs, roughly 13 minutes, the block is finalized.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Finality is the moment a page is glued into the notebook for good. Before that, the most recent pages can still be reordered in rare cases.</p>
+        <div class="card-footer">
+          <span>11 / 16</span>
+          <span class="deck-tag">Consensus</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 12</div>
+        <h3 class="card-title">Majority (51%) Attack</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Whoever controls a majority of hash power or stake can censor transactions and reorder recent blocks that are not yet final.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">If one group controls most of the votes, it can rewrite the latest pages in its favour. Ethereum Classic suffered this several times in 2019 and 2020.</p>
+        <div class="card-footer">
+          <span>12 / 16</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 13</div>
+        <h3 class="card-title">Tamper Evidence</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Editing one block changes its hash, so the next block no longer points at it and every later block falls out of proof.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of a tamper-evident seal on a medicine bottle. It does not stop someone opening it, but nobody can open it without it showing.</p>
+        <div class="card-footer">
+          <span>13 / 16</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 14</div>
+        <h3 class="card-title">Private Key, Public Key &amp; Address</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Ethereum uses ECDSA over the secp256k1 curve. Your address is the last 20 bytes of the Keccak-256 hash of your public key. There is no username and no password.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The private key is your account’s only key and your signature pen at once. The address is your public mailbox number, derived from it. Whoever holds the key owns the account: no helpdesk, no reset, no chargeback.</p>
+        <div class="card-footer">
+          <span>14 / 16</span>
+          <span class="deck-tag">Identity</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 15</div>
+        <h3 class="card-title">Digital Signature</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Proof created with a private key over a transaction. Any node can verify it with the public key, which is recovered from the signature itself, and that is where the sender address comes from.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A signature is a wax seal only you can make but anyone can check. The seal itself is the authority to move funds.</p>
+        <div class="card-footer">
+          <span>15 / 16</span>
+          <span class="deck-tag">Identity</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 13 · Key Term 16</div>
+        <h3 class="card-title">Threat Model</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">What the chain does not protect: confidentiality (everything is public), your keys, contract logic, and off-chain trust added by bridges and oracles.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The chain keeps the record honest, but it cannot guard your keys or fix buggy code. Most losses happen around the chain, not inside it: the Bybit theft (2025), The DAO (2016) and Ronin (2022) all came from keys, code or bridges.</p>
+        <div class="card-footer">
+          <span>16 / 16</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="session" id="s14">
+      <h2 class="session-title"><span>Session 14</span>Solidity: Deploy and Interact</h2>
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 01</div>
+        <h3 class="card-title">Testnet (Sepolia)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A public Ethereum test network, chain ID 11155111. Its ETH has no value, but blocks, signatures and gas behave like mainnet.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A testnet is a flight simulator for the blockchain. Everything works like the real thing, but crashing costs nothing.</p>
+        <div class="card-footer">
+          <span>01 / 13</span>
+          <span class="deck-tag">Network</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 02</div>
+        <h3 class="card-title">Bytecode</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The compiled version of your smart contract written in numbers and machine instructions.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of Solidity source code as the recipe written in plain English, and bytecode as the exact, numbered instruction manual meant for the computer (the Ethereum Virtual Machine) to actually build the dish. It is what gets permanently stored on the blockchain when you deploy.</p>
+        <div class="card-footer">
+          <span>02 / 13</span>
+          <span class="deck-tag">Compilation</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 03</div>
+        <h3 class="card-title">ABI (Application Binary Interface)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A machine-readable list of all the functions and data types inside a smart contract.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of an ABI as the menu and instruction sheet for a smart contract. It tells external apps (like Remix, MetaMask, or a website) what buttons (functions) exist, what ingredients (inputs) they need, and how to talk to the contract code living on the blockchain.</p>
+        <div class="card-footer">
+          <span>03 / 13</span>
+          <span class="deck-tag">Interface</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 04</div>
+        <h3 class="card-title">EVM (Ethereum Virtual Machine)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The decentralized software environment that executes smart contract bytecode across all nodes.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The EVM is the universal “virtual computer” running on every single node of the blockchain. No matter what physical computer or operating system a validator uses, the EVM ensures that the bytecode runs identically everywhere.</p>
+        <div class="card-footer">
+          <span>04 / 13</span>
+          <span class="deck-tag">Execution</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 05</div>
+        <h3 class="card-title">Deployment Transaction</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">An ordinary transaction with an empty to field and the contract’s init code as its data. Deployed code is capped at 24,576 bytes by EIP-170.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">There is no special deploy button on the chain itself. Deploying is just sending a transaction addressed to nobody, carrying your program. It waits in the same queue and pays gas like any transfer.</p>
+        <div class="card-footer">
+          <span>05 / 13</span>
+          <span class="deck-tag">Deployment</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 06</div>
+        <h3 class="card-title">Contract Address</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Derived from the deployer’s address and nonce: the last 20 bytes of keccak256 of their RLP encoding. CREATE2 offers a salt-based alternative.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A contract’s address is not random. Like a house number that follows from the street and the plot number, anyone can work it out before the contract is deployed.</p>
+        <div class="card-footer">
+          <span>06 / 13</span>
+          <span class="deck-tag">Deployment</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 07</div>
+        <h3 class="card-title">Gas &amp; Gas Limit</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The execution fee metric required to conduct operations or deploy code on the network.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Gas is the fuel or processing fee you pay to run code on the blockchain. The Gas Limit is the maximum amount of fuel you are willing to let the transaction consume so it doesn’t get stuck running an infinite loop.</p>
+        <div class="card-footer">
+          <span>07 / 13</span>
+          <span class="deck-tag">Fees</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 08</div>
+        <h3 class="card-title">Nonce (Account Nonce)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A sequential counter tracking the number of transactions sent from an address.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A transaction nonce is like a digital receipt number or check sequence for your wallet. It ensures that every transaction you send is processed in exact chronological order and prevents anyone from copying your transaction and replaying it.</p>
+        <div class="card-footer">
+          <span>08 / 13</span>
+          <span class="deck-tag">Transactions</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 09</div>
+        <h3 class="card-title">Call (Read)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">eth_call runs a function on a single node against current state. It creates no transaction, costs nothing, needs no signature, and cannot change state.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A call is like checking your balance at an ATM screen. You look, nothing changes, and nobody charges you.</p>
+        <div class="card-footer">
+          <span>09 / 13</span>
+          <span class="deck-tag">Interaction</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 10</div>
+        <h3 class="card-title">Transaction (Write) &amp; Function Selector</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A write is a signed transaction whose data starts with the function selector, the first four bytes of keccak256 of the function signature. It pays gas, is mined, and changes state for everyone.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A write is like filing a form that changes the official record. You sign it, pay a fee, and once it is processed everyone sees the new state. The selector is the form number that tells the contract which function you mean.</p>
+        <div class="card-footer">
+          <span>10 / 13</span>
+          <span class="deck-tag">Interaction</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 11</div>
+        <h3 class="card-title">Source Verification</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The process of publishing your original Solidity code so block explorers can match it against deployed bytecode.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Source verification is like publishing the blueprint next to a locked building. It proves to the public that the compiled bytecode on the blockchain actually matches the human-readable code you claim it is.</p>
+        <div class="card-footer">
+          <span>11 / 13</span>
+          <span class="deck-tag">Explorer</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 12</div>
+        <h3 class="card-title">Chain ID &amp; Replay Protection (EIP-155)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">EIP-155 puts the chain ID inside the signed transaction data, so a transaction signed for Sepolia cannot be replayed on mainnet.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">The chain ID is like the country written on a cheque. A cheque made out for one country cannot be cashed in another.</p>
+        <div class="card-footer">
+          <span>12 / 13</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 14 · Key Term 13</div>
+        <h3 class="card-title">Access Control (onlyOwner, msg.sender)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Write functions check msg.sender, the caller, against an owner set in the constructor. The ABI does not show whether that check exists; only the source does.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Access control is the lock on the staff-only door. The ABI shows every door in the building, but only the source code shows which ones are locked. One missing lock on withdraw() lets anyone drain the funds.</p>
+        <div class="card-footer">
+          <span>13 / 13</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="session" id="s15">
+      <h2 class="session-title"><span>Session 15</span>Digital Identity</h2>
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 01</div>
+        <h3 class="card-title">Identity Silo</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Your identity held as accounts in other people’s databases: the bank, the university, the government portal, the social login.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Every organisation keeps its own file on you. Each file is a breach target, asks for more than it needs, and you cannot prove a fact about yourself without that organisation answering for you.</p>
+        <div class="card-footer">
+          <span>01 / 13</span>
+          <span class="deck-tag">Problem</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 02</div>
+        <h3 class="card-title">Issuer, Holder, Verifier</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The three roles of verifiable credentials. The issuer signs a claim, the holder keeps it in a wallet, and the verifier checks the signature.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A university (issuer) gives you a sealed diploma, you (holder) keep it in your wallet, and an employer (verifier) checks the seal without needing to phone the university.</p>
+        <div class="card-footer">
+          <span>02 / 13</span>
+          <span class="deck-tag">Credentials</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 03</div>
+        <h3 class="card-title">Verifiable Credential</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A signed set of claims about a subject, held by the holder, not stored on any chain. The W3C Verifiable Credentials Data Model 2.0 became a Recommendation in May 2025.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A verifiable credential is a digital ID card or diploma with a tamper-proof seal. You carry it and show it when needed.</p>
+        <div class="card-footer">
+          <span>03 / 13</span>
+          <span class="deck-tag">Credentials</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 04</div>
+        <h3 class="card-title">Decentralized Identifier (DID)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A URI that resolves to a DID document listing public keys, service endpoints and who controls it. DID Core 1.0 has been a W3C Recommendation since July 2022.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A DID is a permanent ID number you control yourself, not one handed out by a company. Looking it up gives you the public keys needed to check that person’s or organisation’s signatures.</p>
+        <div class="card-footer">
+          <span>04 / 13</span>
+          <span class="deck-tag">Identifiers</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 05</div>
+        <h3 class="card-title">DID Methods (did:ethr, did:web)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">did:ethr uses an Ethereum address, with key changes recorded as events in an ERC-1056 registry contract. did:web uses DNS instead of a chain.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Different DID methods store the lookup in different places, much like a phone number can live in a printed directory or an online one. Always ask which source of trust each method really relies on.</p>
+        <div class="card-footer">
+          <span>05 / 13</span>
+          <span class="deck-tag">Identifiers</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 06</div>
+        <h3 class="card-title">On-Chain vs Off-Chain Data</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">On chain: public keys, key rotations, delegate grants, hashes and revocation status. Never on chain: names, dates of birth, document numbers, or the credential itself.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A blockchain is a permanent public noticeboard. Pin up only what is safe for the whole world to read forever. Personal data written there can never be erased, which conflicts with GDPR.</p>
+        <div class="card-footer">
+          <span>06 / 13</span>
+          <span class="deck-tag">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 07</div>
+        <h3 class="card-title">Revocation &amp; Status List</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A long bitstring where each credential owns one index. The issuer flips that bit to revoke the credential, and the update is anchored.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Think of a list of switches, one per credential. Flip a switch off and that diploma or badge is no longer valid, like cancelling a lost card.</p>
+        <div class="card-footer">
+          <span>07 / 13</span>
+          <span class="deck-tag">Credentials</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 08</div>
+        <h3 class="card-title">Herd Privacy</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Many credentials share one status list, so when a verifier fetches the list it does not reveal which holder is being checked.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">You hide in a crowd. Checking one name on a list of thousands does not tell anyone whose name you were looking for. The bigger the list, the better the cover.</p>
+        <div class="card-footer">
+          <span>08 / 13</span>
+          <span class="deck-tag">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 09</div>
+        <h3 class="card-title">Key Rotation</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Replacing an issuer or holder key with a new one, recorded as an ordered, timestamped event in the registry.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Key rotation is changing the locks. If a key may have been copied, you swap it for a new one and the record shows exactly when the change happened.</p>
+        <div class="card-footer">
+          <span>09 / 13</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 10</div>
+        <h3 class="card-title">Selective Disclosure</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The holder reveals only the claims a verifier needs. SD-JWT hides each claim behind a salted hash and reveals chosen ones.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Show the bouncer only that you are old enough, not your address, full name and ID number. Withheld claims never leave the wallet.</p>
+        <div class="card-footer">
+          <span>10 / 13</span>
+          <span class="deck-tag">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 11</div>
+        <h3 class="card-title">Zero-Knowledge Proof</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A proof of a predicate, such as “over 18”, without revealing the underlying data such as the birth date. BBS signatures offer related properties.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Proving you know the answer without saying the answer. You convince the verifier the statement is true while telling them nothing else.</p>
+        <div class="card-footer">
+          <span>11 / 13</span>
+          <span class="deck-tag">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 12</div>
+        <h3 class="card-title">Correlation &amp; Pairwise DIDs</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Reusing the same DID or signature across verifiers lets them link your activity. Pairwise DIDs and unlinkable proofs prevent this.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Using the same loyalty card everywhere lets shops compare notes about you. Giving each shop a different card stops them connecting the dots.</p>
+        <div class="card-footer">
+          <span>12 / 13</span>
+          <span class="deck-tag">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 15 · Key Term 13</div>
+        <h3 class="card-title">EU Digital Identity Wallet (eIDAS 2.0)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Regulation (EU) 2024/1183 entered into force in May 2024 and requires each Member State to offer an EU Digital Identity Wallet, with the deadline at the end of 2026.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A government-backed app on your phone that holds your ID, diplomas and licences as credentials, accepted across the EU.</p>
+        <div class="card-footer">
+          <span>13 / 13</span>
+          <span class="deck-tag">Regulation</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="session" id="s16">
+      <h2 class="session-title"><span>Session 16</span>Gas and Q&amp;A</h2>
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 01</div>
+        <h3 class="card-title">Why Gas Exists</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The EVM is Turing-complete, so no node can know in advance whether a call will finish (the halting problem). Gas meters every step and stops execution when the budget runs out.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Gas is a taxi meter for code. It stops runaway programs, makes spamming the network expensive, and pays the validators who do the work.</p>
+        <div class="card-footer">
+          <span>01 / 14</span>
+          <span class="deck-tag">Fundamentals</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 02</div>
+        <h3 class="card-title">Intrinsic Cost (21,000 Gas)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The fixed gas every transaction pays before any code runs. A plain ETH transfer costs exactly 21,000 gas.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Like a minimum charge just for getting in the taxi, before it moves at all.</p>
+        <div class="card-footer">
+          <span>02 / 14</span>
+          <span class="deck-tag">Fundamentals</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 03</div>
+        <h3 class="card-title">Gas Units vs Gas Price (Gwei)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Gas units measure how much work you asked for. Gas price, quoted in gwei, is what you pay per unit. One gwei is one billionth of an ETH.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Gas units are the litres of fuel; gas price is the price per litre. Your fee is the two multiplied together.</p>
+        <div class="card-footer">
+          <span>03 / 14</span>
+          <span class="deck-tag">Pricing</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 04</div>
+        <h3 class="card-title">Block Gas Limit &amp; Target</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Each block has a gas limit, 60 million on mainnet. EIP-1559 sets the target at half the limit. A block is full when its gas is used, not at a set number of transactions.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A block is a lorry with a weight limit, not a seat count. One heavy contract call can take as much room as a thousand small transfers.</p>
+        <div class="card-footer">
+          <span>04 / 14</span>
+          <span class="deck-tag">Blocks</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 05</div>
+        <h3 class="card-title">Base Fee (EIP-1559)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A protocol-set price per gas unit. It rises by at most 12.5% per block when blocks use more than the target and falls when they use less. The base fee is burned.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Surge pricing set by the network itself: busier roads cost more, quiet roads cost less. That part of your fee is destroyed rather than paid to anyone.</p>
+        <div class="card-footer">
+          <span>05 / 14</span>
+          <span class="deck-tag">Pricing</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 06</div>
+        <h3 class="card-title">Priority Fee (Tip)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The extra amount per gas a sender offers the validator. Block builders sort pending transactions by what they earn, so higher tips go first.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A tip to jump the queue. The validator keeps it, which is why generous tips get served first.</p>
+        <div class="card-footer">
+          <span>06 / 14</span>
+          <span class="deck-tag">Pricing</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 07</div>
+        <h3 class="card-title">Max Fee</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The highest total price per gas a sender will pay. If the base fee rises past it the transaction waits; any unused difference stays in the wallet.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Your spending cap. You never pay more than this, and you keep the change if the actual price turns out lower.</p>
+        <div class="card-footer">
+          <span>07 / 14</span>
+          <span class="deck-tag">Pricing</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 08</div>
+        <h3 class="card-title">Fee Burn</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">The base fee portion of every fee is removed from supply. Only the tip goes to the validator.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Burning removes the temptation for validators to stuff blocks with fake transactions just to push prices up, because they would not receive that money anyway.</p>
+        <div class="card-footer">
+          <span>08 / 14</span>
+          <span class="deck-tag">Pricing</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 09</div>
+        <h3 class="card-title">Rollups (Layer 2)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Networks that move execution off mainnet and post compressed batches of transactions back to it.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Like a carpool. Many passengers share one trip to mainnet, so each pays a fraction of the fare.</p>
+        <div class="card-footer">
+          <span>09 / 14</span>
+          <span class="deck-tag">Scaling</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 10</div>
+        <h3 class="card-title">Blobs (EIP-4844)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Since the Dencun upgrade in March 2024, rollups can post their data as blobs, a separate and much cheaper fee market.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A dedicated cheap freight lane for rollup data, so it no longer competes with regular traffic for space.</p>
+        <div class="card-footer">
+          <span>10 / 14</span>
+          <span class="deck-tag">Scaling</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 11</div>
+        <h3 class="card-title">Opcode &amp; Storage Costs</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Every EVM opcode has a price. ADD costs 3 gas. A storage read costs 2,100 the first time in a transaction and 100 after that (EIP-2929). Writing a non-zero value to an empty slot costs 20,000.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Doing maths is cheap; writing to the blockchain’s permanent filing cabinet is expensive. Good Solidity keeps stored data small and reuses reads.</p>
+        <div class="card-footer">
+          <span>11 / 14</span>
+          <span class="deck-tag">Execution</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 12</div>
+        <h3 class="card-title">Unbounded Loop (Gas DoS)</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">A function that loops over an array anyone can grow. Once the loop needs more gas than a block holds, the function can never run again. GovernMental froze its jackpot this way in 2016.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">A to-do list that strangers can keep adding to until it is too long to ever finish. Fix it by capping loops or letting users collect payouts themselves.</p>
+        <div class="card-footer">
+          <span>12 / 14</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 13</div>
+        <h3 class="card-title">Gas Griefing</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Running out of gas reverts state changes but does not refund the gas. An attacker supplies just enough gas for an outer call to succeed while an inner call fails.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Giving someone just enough fuel to leave the station but not enough to arrive. Always check the result of low-level calls and do not let strangers decide how much gas your logic gets.</p>
+        <div class="card-footer">
+          <span>13 / 14</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Session 16 · Key Term 14</div>
+        <h3 class="card-title">Front-Running &amp; Sandwich Attack</h3>
+        <p class="card-label">What it is</p>
+        <p class="card-body lead">Because the mempool is public, anyone can see a pending transaction and outbid it with a higher tip. A sandwich wraps a victim’s trade with a buy before and a sell after.</p>
+        <p class="card-label">In plain words</p>
+        <p class="card-body">Someone overhears your order at the counter and pays to be served first, then sells to you at a higher price. Defences include commit-reveal schemes, slippage limits and private transaction relays.</p>
+        <div class="card-footer">
+          <span>14 / 14</span>
+          <span class="deck-tag">Security</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>
+
+```

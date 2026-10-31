@@ -14,10 +14,12 @@ You need three things.
 
 Windows: install WSL2 (Ubuntu) and work inside it. Foundry does not run natively on Windows.
 
-Then, inside this folder:
+Then get the code and set it up:
 
 ```sh
-make install     # fetches the forge-std library
+git clone --recursive <this repo's URL>
+cd <repo folder>
+make install     # fetches the forge-std library if the clone skipped it
 cp .env.example .env
 make doctor      # tells you what is missing
 ```
@@ -97,7 +99,7 @@ Keep the deploy script's constructor arguments in sync with your contract, and i
 forge test --match-test test_increment -vvvv        # one test, full trace
 forge test --gas-report                             # gas per function
 cast call <address> "number()(uint256)" --rpc-url http://127.0.0.1:8545
-cast send <address> "increment()" --rpc-url http://127.0.0.1:8545 --private-key $PRIVATE_KEY
+cast send <address> "increment()" --rpc-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80  # Anvil #0, local only
 cast balance <address> --ether --rpc-url https://rpc.glassnet.prismo.network/
 ```
 

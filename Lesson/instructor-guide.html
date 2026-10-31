@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructor Talking Points</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   Lumen Design System: Token Layer (Dark Theme Default)
+   ============================================================================ */
+:root {
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-12: 0.75rem; --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem;
+  --fs-20: 1.25rem; --fs-24: 1.5rem; --fs-36: 2.25rem;
+
+  --lh-tight: 1.1; --lh-normal: 1.55;
+  --tr-eyebrow: 0.08em;
+
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-bg-sunken: var(--ink-1000);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-300);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+
+  --reading: 1rem;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(90deg, transparent 88px, color-mix(in srgb, var(--color-text) 6%, transparent) 88px 89px, transparent 89px 94px, color-mix(in srgb, var(--color-text) 6%, transparent) 94px 95px, transparent 95px),
+    repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--color-text) 6%, transparent) 39px 40px),
+    var(--color-bg);
+}
+
+.eyebrow {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* -- layout: sticky outline on the left, talking points on the right -------- */
+.layout { display: grid; grid-template-columns: 17rem 1fr; gap: 3rem; max-width: 76rem; margin: 0 auto; padding: 2rem; }
+.outline { position: sticky; top: 1.5rem; align-self: start; max-height: calc(100vh - 3rem); overflow: auto; display: flex; flex-direction: column; gap: 1.25rem; }
+.outline-title { font-weight: var(--fw-black); font-size: var(--fs-20); letter-spacing: -0.03em; margin: 0.5rem 0 0 0; }
+.outline ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.125rem; }
+.outline a { display: flex; justify-content: space-between; gap: 0.5rem; color: var(--color-text-muted); text-decoration: none; font-size: var(--fs-14); padding: 0.25rem 0 0.25rem 0.625rem; border-left: 2px solid transparent; }
+.outline a:hover { color: var(--color-text); }
+.outline a.is-session { color: var(--color-text); font-weight: var(--fw-semibold); margin-top: 0.625rem; }
+.outline a.is-here { border-left-color: var(--color-accent); color: var(--color-text); }
+.outline a.is-done { color: var(--color-text-subtle); }
+.outline a.is-session span { font: var(--fw-semibold) var(--fs-14) var(--font-sans); color: var(--color-text); }
+.outline a:not(.is-session) span + span { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); }
+.tools { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.tools button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text); border: 1px solid var(--color-border-strong); padding: 0.375rem 0.625rem; cursor: pointer;
+}
+.tools button:hover { border-color: var(--color-accent); }
+
+main { min-width: 0; display: flex; flex-direction: column; gap: 1.5rem; font-size: var(--reading); }
+
+.page-head { padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-strong); }
+.page-title { font-weight: var(--fw-black); font-size: var(--fs-36); letter-spacing: -0.04em; line-height: var(--lh-tight); margin: 0.75rem 0 1rem 0; }
+.page-lead { font-size: 1.125em; line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+.legend span { font-size: var(--fs-14); color: var(--color-text-muted); }
+
+/* -- session block --------------------------------------------------------- */
+.session { scroll-margin-top: 1.5rem; padding-top: 1rem; }
+.session-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 2px solid var(--color-accent); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.session-title { font-weight: var(--fw-black); font-size: var(--fs-36); letter-spacing: -0.04em; line-height: var(--lh-tight); margin: 0.5rem 0 0 0; }
+.session-goal { font-size: 1.125em; color: var(--color-text-muted); margin: 0.75rem 0 0 0; max-width: 46rem; line-height: var(--lh-normal); }
+.open-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.open-links a, .file {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  color: var(--color-text); text-decoration: none; border: 1px solid var(--color-border-strong); padding: 0.375rem 0.75rem;
+}
+.open-links a:hover { border-color: var(--color-accent); }
+
+.prep { border: 1px dashed var(--color-border-strong); padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+.prep ul { margin: 0.5rem 0 0 0; padding-left: 1.25rem; }
+.prep li { font-size: 0.95em; line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0.25rem 0; }
+
+/* -- one talking-point card ------------------------------------------------- */
+.seg { border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.5rem 1.75rem; margin-bottom: 1rem; scroll-margin-top: 1.5rem; transition: opacity 0.2s; }
+.seg.is-demo { border-color: var(--color-accent); box-shadow: inset 4px 0 0 var(--color-accent); }
+.seg.is-done { opacity: 0.45; }
+.seg-head { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: start; }
+.cue a.file { text-transform: none; }
+.cue { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.cue .tag { font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; border: 1px solid var(--color-border-strong); padding: 0.125rem 0.5rem; color: var(--color-text); }
+.cue .tag.is-solid { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.seg-title { font-weight: var(--fw-bold); font-size: 1.5em; letter-spacing: -0.02em; line-height: var(--lh-tight); margin: 0.625rem 0 0 0; }
+.done { display: flex; align-items: center; gap: 0.375rem; font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); cursor: pointer; white-space: nowrap; }
+.done input { width: 1.125rem; height: 1.125rem; accent-color: var(--ink-25); cursor: pointer; margin: 0; }
+
+.points { margin: 1rem 0 0 0; padding-left: 1.25rem; }
+.points li { line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0.375rem 0; }
+.points li::marker { color: var(--color-text-subtle); }
+.points b { color: var(--color-text); font-weight: var(--fw-semibold); }
+
+.land, .ask, .say { margin: 1rem 0 0 0; padding: 0.75rem 1rem; line-height: var(--lh-normal); }
+.land { background: var(--color-text); color: var(--color-bg); font-weight: var(--fw-semibold); }
+.land::before, .ask::before, .say::before { display: block; font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; margin-bottom: 0.25rem; }
+.land::before { content: "Land it"; color: var(--ink-600); }
+.ask { border: 1px solid var(--color-border-strong); color: var(--color-text); }
+.ask::before { content: "Ask the room"; color: var(--color-text-subtle); }
+.how { margin: 1rem 0 0 0; line-height: var(--lh-normal); color: var(--color-text-muted); }
+.say { border-left: 2px solid var(--color-border-strong); color: var(--color-text-muted); padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.say::before { content: "If asked"; color: var(--color-text-subtle); }
+
+.steps { list-style: none; margin: 1rem 0 0 0; padding: 0; counter-reset: s; display: flex; flex-direction: column; gap: 1rem; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 2rem 1fr; gap: 0.5rem; }
+.steps > li > div, .seg-head > div { min-width: 0; }
+.steps > li::before { content: counter(s, decimal-leading-zero); font: var(--fw-regular) var(--fs-14) var(--font-mono); color: var(--color-text-subtle); padding-top: 0.125rem; }
+.steps p { margin: 0.25rem 0 0 0; line-height: var(--lh-normal); color: var(--color-text-muted); }
+.steps p:first-child { margin-top: 0; color: var(--color-text); font-weight: var(--fw-semibold); }
+pre {
+  margin: 0.5rem 0 0 0; padding: 0.625rem 0.875rem; background: var(--color-bg-sunken); border: 1px solid var(--color-border);
+  overflow-x: auto; font: var(--fw-regular) var(--fs-14) var(--font-mono); line-height: var(--lh-normal); color: var(--color-text);
+}
+
+.foot { color: var(--color-text-subtle); font-size: var(--fs-14); border-top: 1px solid var(--color-border); padding-top: 1rem; margin-top: 1rem; }
+.foot a { color: var(--color-text); }
+
+@media (max-width: 60rem) {
+  .layout { grid-template-columns: 1fr; padding: 1rem; gap: 1.5rem; }
+  .outline { position: static; max-height: none; }
+  .outline ol { display: none; }
+  .seg { padding: 1.25rem; }
+  .page-title, .session-title { font-size: var(--fs-24); }
+}
+@media print {
+  body { background: #fff; color: #000; }
+  .outline, .done { display: none; }
+  .layout { display: block; padding: 0; }
+  .seg { break-inside: avoid; background: #fff; border-color: #999; }
+  .seg.is-done { opacity: 1; }
+  .points li, .steps p, .session-goal, .page-lead, .prep li { color: #222; }
+  .land { background: #eee; color: #000; }
+  pre { background: #f4f4f4; color: #000; }
+  .session { break-before: page; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="outline" aria-label="Outline">
+    <div>
+      <div class="eyebrow">Sessions 13 to 16</div>
+      <p class="outline-title">Talking points</p>
+    </div>
+    <div class="tools">
+      <button type="button" id="smaller" aria-label="Smaller text">A−</button>
+      <button type="button" id="bigger" aria-label="Bigger text">A+</button>
+      <button type="button" id="clear">Clear ticks</button>
+    </div>
+    <ol id="toc"></ol>
+  </aside>
+
+  <main>
+    <header class="page-head">
+      <div class="eyebrow">Instructor only · Blockchain for Cybersecurity</div>
+      <h1 class="page-title">Talking points, in order</h1>
+      <p class="page-lead">One card per scene, in the order the decks run, with the wallet, kit and DID demos placed where they belong. Tick a card when it is done; ticks are saved in this browser. In any deck, press N for full speaker notes and K for the plain-language key terms.</p>
+      <div class="legend">
+        <span><span class="tag mono" style="border:1px solid var(--color-border-strong);padding:0.125rem 0.5rem">Deck</span> a scene in the slide deck</span>
+        <span><span class="mono" style="background:var(--color-text);color:var(--color-bg);padding:0.125rem 0.5rem">Demo</span> switch away from the deck</span>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <section class="session" id="s13">
+      <div class="session-head">
+        <div>
+          <div class="eyebrow">Session 13</div>
+          <h2 class="session-title">Blockchain 101</h2>
+          <p class="session-goal">Goal: a shared mental model. A blockchain is a ledger many computers keep, anyone can check, and no one can quietly edit. Everything is built from hashes, signatures and consensus.</p>
+        </div>
+        <div class="open-links">
+          <a href="session-13-blockchain-101.html" target="_blank">Open deck</a>
+          <a href="descriptions.html#s13" target="_blank">Terms</a>
+        </div>
+      </div>
+
+      <div class="seg" id="s13-open">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">00 · Open</span></div><h3 class="seg-title">What a blockchain is</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Working definition: <b>a ledger replicated across many independent computers</b>. Anyone can check the history; no single party can rewrite it without being caught.</li>
+          <li>The problem it solves: <b>double-spending without a trusted middleman</b>. The digital version of the Byzantine Generals problem.</li>
+          <li>Tonight uses three primitives they already know from the program: hashes, signatures, consensus.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s13-hash">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">01 · Hash</span></div><h3 class="seg-title">Hash functions</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>SHA-256 for Bitcoin, Keccak-256 for Ethereum. Any input, any size, <b>fixed 256-bit output</b>.</li>
+          <li>Three properties: deterministic, infeasible to reverse, collision resistant.</li>
+          <li><b>Avalanche effect</b>: on screen, "0.50" and "0.51" differ by one bit, and 136 of 256 output bits change.</li>
+          <li>Merkle trees: hash pairs of transactions up to one root, so one root commits to every transaction in the block.</li>
+        </ul>
+        <p class="land">You cannot nudge a record and keep its fingerprint.</p>
+      </div>
+
+      <div class="seg" id="s13-order">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">02 · Order</span><span class="tag">03 · Chain</span></div><h3 class="seg-title">Blocks and the hash link</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>A hash fingerprints one record. A blockchain also needs <b>order</b>: if I sign two payments with the same coins, the network must agree which counts.</li>
+          <li>Blocks are the unit of ordering: height, timestamp, list of transactions, identified by their own hash.</li>
+          <li>The core trick: <b>each block header stores the hash of the previous block</b>, back to genesis. Change anything old and the next block stops pointing at it.</li>
+          <li>Same structure as Git commits or a tamper-evident audit log.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s13-mempool">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">04 · Mempool</span></div><h3 class="seg-title">From wallet to block</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>A user signs in a wallet and broadcasts. Nodes check signature and nonce, then hold it in the <b>mempool</b>, a public waiting room.</li>
+          <li>Public mempool is a security issue: anyone sees your transaction before it confirms. Root of front-running (Session 16).</li>
+          <li>Ethereum: 12-second slots, one validator per slot chosen by stake. It picks by fee, executes, publishes the new state root; others attest.</li>
+          <li><b>Finalized after two epochs, about 13 minutes.</b></li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s13-consensus">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">05 · Consensus</span></div><h3 class="seg-title">Who adds the next block</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>Proof of Work</b> (Bitcoin): solve a costly hash puzzle. Rewriting history means redoing the work faster than the honest network. Security is energy spent.</li>
+          <li><b>Proof of Stake</b> (Ethereum since the Merge, September 2022): lock at least 32 ETH; sign two conflicting blocks and get slashed. Energy use fell by more than 99%.</li>
+          <li><b>The limit</b>: a majority of hash power or stake can censor and reorder recent, not-yet-final blocks. Ethereum Classic suffered 51% attacks in 2019 and 2020.</li>
+        </ul>
+        <p class="ask">For any chain: how expensive is it to get the majority, and what does finality guarantee?</p>
+      </div>
+
+      <div class="seg" id="s13-tamper">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">06 · Tamper</span></div><h3 class="seg-title">Live tamper evidence</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Someone edits one transaction in block 26,104,903. Its fingerprint changes; block 904 still holds the old one; <b>every later block falls out of proof</b>.</li>
+          <li>To hide it, the attacker must recompute every later block and out-pace the network: the majority attack from the last slide.</li>
+        </ul>
+        <p class="land">Tamper evidence, not tamper prevention.</p>
+      </div>
+
+      <div class="seg" id="s13-signature">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">07 · Signature</span></div><h3 class="seg-title">Keys are the identity</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>A transaction: sender, recipient, value, nonce, signature. ECDSA over secp256k1, the same curve as Bitcoin.</li>
+          <li>Address = <b>last 20 bytes of Keccak-256 of the public key</b>. No username, no password.</li>
+          <li>Any node verifies the signature with the public key, <b>recovered from the signature itself</b>. That is where the "from" address comes from.</li>
+          <li>The nonce, a counter per account, stops replay of the same signed transaction.</li>
+        </ul>
+        <p class="land">Whoever holds the key owns the account. No helpdesk, no reset, no chargeback.</p>
+      </div>
+
+      <div class="seg" id="s13-threats">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">08 · Threats</span></div><h3 class="seg-title">What the chain does not protect</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Strong: integrity and availability. <b>Not given: confidentiality</b>. Everything is public by default.</li>
+          <li><b>Keys</b>: Bybit, February 2025, about 1.5 billion dollars, through a compromised signing interface, not broken cryptography.</li>
+          <li><b>Contract logic</b>: The DAO, 2016, about 3.6 million ETH, a re-entrancy bug.</li>
+          <li><b>Bridges and oracles</b>: Ronin, 2022, about 625 million dollars, 5 of 9 validator keys taken.</li>
+        </ul>
+        <p class="land">Most losses happen around the chain, not inside it.</p>
+      </div>
+
+      <div class="seg" id="s13-close">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">09 · Close</span></div><h3 class="seg-title">Homework</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Install MetaMask (or use Brave Wallet) in a fresh browser profile; <b>a new wallet used only for this course</b>.</li>
+          <li>The slide says Sepolia (chain ID 11155111). For the kit, also add Prismo Glassnet and request test USDC at <span class="mono">faucet.glassnet.prismo.network</span>. Faucets can be slow: do it tonight.</li>
+          <li>Send a small amount to a classmate and find it on the explorer: block number, gas used, nonce.</li>
+          <li>Never use a wallet that holds real funds for class work.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <section class="session" id="s14">
+      <div class="session-head">
+        <div>
+          <div class="eyebrow">Session 14</div>
+          <h2 class="session-title">Solidity: deploy and interact</h2>
+          <p class="session-goal">Goal: take a contract from source code to a live address, read it, write to it, and verify it. Then show the whole journey live with the kit.</p>
+        </div>
+        <div class="open-links">
+          <a href="session-14-solidity-deploy-interact%20(1).html" target="_blank">Open deck</a>
+          <a href="wallet-flow.html" target="_blank">Wallet animation</a>
+          <a href="student-lab.html" target="_blank">Student page</a>
+          <a href="descriptions.html#s14" target="_blank">Terms</a>
+        </div>
+      </div>
+
+      <div class="prep">
+        <div class="eyebrow">Before class</div>
+        <ul>
+          <li>Three terminals in the kit folder: <code>make anvil</code>, <code>make dapp</code>, and one free for the demo. MetaMask on Anvil with account #0 imported.</li>
+          <li><code>make doctor</code> shows a Prismo balance. If you ran the Hello World demo before, reset it (INSTRUCTOR.md).</li>
+          <li>Share <code>student-lab.html</code> so students can follow what you are about to do.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s14-open">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">00 · Open</span></div><h3 class="seg-title">From source to a live address</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Tonight's target: a public testnet. <b>Test ETH (or test USDC on Prismo) has no value</b>, so mistakes cost nothing.</li>
+          <li>Everything else behaves like mainnet: real blocks, real signatures, real gas.</li>
+          <li>Counter.sol is the contract each of them will see deployed by the end.</li>
+        </ul>
+        <p class="say">The slides use Sepolia. The live demo uses Prismo Glassnet, a public zkRollup testnet (chain ID 101001000). Same Ethereum rules.</p>
+      </div>
+
+      <div class="seg" id="s14-compile">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">01 · Compile</span></div><h3 class="seg-title">Bytecode and ABI</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Solidity is not what runs on chain. The compiler produces two artifacts: <b>EVM bytecode</b> (deployed) and the <b>ABI</b> (a JSON menu of functions).</li>
+          <li>Deployed code is capped at <b>24,576 bytes by EIP-170</b>. Why large systems split into several contracts or use proxies.</li>
+        </ul>
+        <p class="land">Bytecode is what runs. The ABI is how anyone talks to it.</p>
+      </div>
+
+      <div class="seg" id="s14-tx">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">02 · Transaction</span><span class="tag">03 · Mempool</span><span class="tag">04 · Block</span></div><h3 class="seg-title">A deploy is just a transaction</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>No special deploy command: <b>an ordinary transaction with an empty "to" field</b> and the init code as data. Same mempool, same gas, same blocks.</li>
+          <li>The wallet signs; the transaction waits in the mempool with everyone else's.</li>
+          <li>Blocks hold an ordered list and point at the previous hash (Session 13). <b>Order matters</b>: two transactions on the same contract give different state depending on which runs first. That is where front-running lives.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s14-address">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">05 · Address</span></div><h3 class="seg-title">Where the contract lands</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Receipt status 1 means success.</li>
+          <li>The contract address is not random: <b>last 20 bytes of keccak256 of RLP(deployer, nonce)</b>. Anyone can predict it before you deploy.</li>
+          <li>CREATE2 offers a salt-based alternative; it matters later for counterfactual wallets.</li>
+        </ul>
+      </div>
+
+      <div class="seg is-demo" id="s14-wallet">
+        <div class="seg-head"><div><div class="cue"><span class="tag is-solid">Demo</span><a class="file" href="wallet-flow.html" target="_blank">wallet-flow.html</a><span class="tag">about 8 min</span></div><h3 class="seg-title">How a wallet connects a page to the chain</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <p class="how">Use this before the Interact scene. Press Play, or step with the arrow keys. Toggle MetaMask and Brave Wallet in the top right: both behave the same.</p>
+        <ol class="steps">
+          <li><div><p>Connect (steps 1 to 3)</p><p>The page knocks on <code>window.ethereum</code>. You approve. <b>Only the address is shared; the key never leaves the wallet.</b> Then the page checks the chain ID.</p></div></li>
+          <li><div><p>Read (steps 4 to 6)</p><p><code>eth_call</code> with the selector <code>0x8381f58a</code> for <code>number()</code>. The node runs the bytecode in its EVM and throws the result away. Free, no signature.</p></div></li>
+          <li><div><p>Write (steps 7 to 12)</p><p>Increment becomes data <code>0xd09de08a</code>. The page can only ask; the wallet shows the prompt, you confirm, it signs inside. The signed bytes go to a node, wait in the mempool, land in a block, and every node's EVM moves 7 to 8.</p></div></li>
+        </ol>
+        <p class="land">The page asks, the wallet signs, the node relays, the chain decides.</p>
+        <p class="ask">Step 8, the confirm prompt: what should you read before pressing Confirm?</p>
+      </div>
+
+      <div class="seg" id="s14-interact">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">06 · Interact</span></div><h3 class="seg-title">Call, send, verify</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>Call</b> (<code>eth_call</code>): one node, current state, no transaction, no fee, no signature. Cannot change state.</li>
+          <li><b>Send</b>: a signed transaction whose data starts with the 4-byte function selector. Pays gas, gets mined, changes state for everyone. <b>The nonce goes up by one.</b></li>
+          <li><b>Verify</b>: until verified, the explorer shows only bytecode. Verification publishes source and compiler settings so the explorer can recompile and match.</li>
+        </ul>
+        <p class="land">Treat an unverified contract as unreadable: you are trusting code you cannot inspect.</p>
+      </div>
+
+      <div class="seg" id="s14-signature">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">07 · Signature</span></div><h3 class="seg-title">Inside a signed transaction</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Fields: nonce, gas settings, to, value, data, chain ID. <b>There is no "from" field</b>: the sender is recovered from the signature.</li>
+          <li>Every node recovers the public key, derives the address, checks nonce and balance.</li>
+          <li><b>EIP-155 puts the chain ID inside the signed data</b>, so a testnet transaction cannot be replayed on mainnet.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s14-abi">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">08 · ABI</span></div><h3 class="seg-title">The ABI is your attack surface</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>One question per write function: <b>who can call this?</b> reset, withdraw and transferOwnership check msg.sender against the owner.</li>
+          <li>Delete <code>onlyOwner</code> from withdraw: <b>the ABI does not change</b>. Same name, same selector. Only the source shows the check is gone, and anyone can drain it.</li>
+          <li>Same lens for tokens: an unlimited <code>approve()</code> to a malicious spender is how most wallet-drainer phishing works.</li>
+        </ul>
+        <p class="land">One missing modifier on one line is a classic real-world loss.</p>
+      </div>
+
+      <div class="seg is-demo" id="s14-kit">
+        <div class="seg-head"><div><div class="cue"><span class="tag is-solid">Demo</span><span class="tag">Kit terminal</span><span class="tag">about 15 min</span></div><h3 class="seg-title">Hello World, from zero to live</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ol class="steps">
+          <li><div><p>Create it</p><pre>make new-dapp NAME=HelloWorld</pre><p>Walk <code>src/HelloWorld.sol</code>: <code>message</code>, the immutable <code>owner</code>, <code>setMessage</code>, the <code>MessageChanged</code> event.</p></div></li>
+          <li><div><p>Write the greeting</p><p>In <code>script/HelloWorld.s.sol</code>: <code>new HelloWorld("Hello, World!")</code>.</p></div></li>
+          <li><div><p>Test before deploying: it cannot be edited later</p><pre>forge test --match-contract HelloWorldTest -vv</pre></div></li>
+          <li><div><p>Deploy locally</p><pre>make deploy NETWORK=local CONTRACT=HelloWorld</pre><p>Point at the printed address and the entry in <code>web/deployments.json</code>.</p></div></li>
+          <li><div><p>Read it: a call, free</p><pre>cast call &lt;address&gt; "message()(string)" --rpc-url http://127.0.0.1:8545</pre></div></li>
+          <li><div><p>Write it: a transaction, signed</p><p>Reload localhost:3000, open HelloWorld, send "Hello, AIM!", confirm in MetaMask, show the <code>MessageChanged</code> entry. Connect this back to the wallet animation.</p></div></li>
+          <li><div><p>Publish and verify on Prismo</p><pre>make deploy NETWORK=prismo CONTRACT=HelloWorld
+CONSTRUCTOR_ARGS=$(cast abi-encode 'constructor(string)' "Hello, World!") make verify CONTRACT=HelloWorld</pre><p>Open the explorer link: transaction, verified source, <code>message</code> under Read Contract. Ask students to open it on their phones.</p></div></li>
+        </ol>
+        <p class="land">Anyone in the world can now read this contract.</p>
+        <p class="say">Verification fails if the string in CONSTRUCTOR_ARGS differs from the deploy script by even one character.</p>
+      </div>
+
+      <div class="seg" id="s14-close">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">09 · Close</span></div><h3 class="seg-title">Homework</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Deploy your own Counter, make one call and one write, verify the source, send me the address.</li>
+          <li>Add an owner-only function and call it from a second account. <b>It should fail.</b></li>
+          <li>Next week: digital identity on blockchain.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <section class="session" id="s15">
+      <div class="session-head">
+        <div>
+          <div class="eyebrow">Session 15</div>
+          <h2 class="session-title">Digital identity</h2>
+          <p class="session-goal">Goal: what changes when the holder carries the proof, and what the blockchain does and does not do in that picture. Then prove it live.</p>
+        </div>
+        <div class="open-links">
+          <a href="session-15-digital-identity.html" target="_blank">Open deck</a>
+          <a href="did-flow.html" target="_blank">DID animation</a>
+          <a href="descriptions.html#s15" target="_blank">Terms</a>
+        </div>
+      </div>
+
+      <div class="prep">
+        <div class="eyebrow">Before class</div>
+        <ul>
+          <li>Deploy the DID contracts once: <code>make did STEP=setup NETWORK=prismo</code>, then <code>make verify CONTRACT=DIDRegistry</code> and <code>make verify CONTRACT=StatusList</code>.</li>
+          <li>If you rehearsed, run <code>make did STEP=reset NETWORK=prismo</code> so the demo starts with a fresh student.</li>
+          <li>Open <code>did-flow.html</code> in a second tab.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s15-open">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">00 · Open</span></div><h3 class="seg-title">Identity today is silos</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Your identity is accounts in other people's databases: bank, university, government portal, social login.</li>
+          <li>Each silo is <b>a breach target</b>, each asks for more data than it needs, and you cannot prove a fact about yourself without the silo answering for you.</li>
+        </ul>
+        <p class="ask">How many organisations hold a copy of your passport number?</p>
+      </div>
+
+      <div class="seg" id="s15-creds">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">01 · Credentials</span></div><h3 class="seg-title">Issuer, holder, verifier</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>The issuer signs a claim, the holder keeps it in a wallet, the verifier checks the signature.</li>
+          <li>W3C Verifiable Credentials Data Model 2.0: Recommendation since May 2025.</li>
+          <li><b>The verifier never contacts the issuer.</b> That is the privacy property we want.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s15-did">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">02 · DID</span></div><h3 class="seg-title">Decentralized Identifiers</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>A DID is a URI that resolves to a <b>DID document</b>: public keys, service endpoints, who controls it. DID Core 1.0, W3C Recommendation since July 2022.</li>
+          <li><code>did:ethr</code>: the identifier is an Ethereum address; changes are events in an <b>ERC-1056 registry</b>, ordered and timestamped by block height.</li>
+          <li><code>did:web</code> uses DNS instead of a chain.</li>
+        </ul>
+        <p class="ask">For each DID method: which trust root does it really rely on?</p>
+      </div>
+
+      <div class="seg" id="s15-registry">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">03 · Registry</span></div><h3 class="seg-title">What goes on chain, and what never does</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>On chain</b>: public keys, key rotations, delegate grants, hashes, revocation status.</li>
+          <li><b>Never</b>: names, dates of birth, document numbers, the credential itself.</li>
+          <li>A chain is append-only and public: personal data written there cannot be erased, which conflicts with GDPR.</li>
+        </ul>
+        <p class="ask">If a hash of personal data is on chain, is it still personal data? (Often yes, when the input space is small.)</p>
+      </div>
+
+      <div class="seg" id="s15-revoke">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">04 · Revocation</span></div><h3 class="seg-title">Status lists and herd privacy</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Credentials must be revocable: a diploma issued in error, an employee who leaves, a stolen device.</li>
+          <li>A <b>status list</b> is a long bitstring; each credential owns one index. The issuer flips the bit and anchors the update.</li>
+          <li>The verifier fetches the whole list, shared by many credentials, so the check does not reveal which holder is verified: <b>herd privacy</b>. List size matters.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s15-tamper">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">05 · Tamper</span></div><h3 class="seg-title">Attacking the registry</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>An attacker edits a key entry in an earlier block to swap in their own key and impersonate the owner.</li>
+          <li>The entry's hash changes, the next entry stops pointing at it, every later entry falls out of proof.</li>
+        </ul>
+        <p class="land">The registry's integrity holds. The weak points are elsewhere.</p>
+      </div>
+
+      <div class="seg" id="s15-cred">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">06 · Credential</span></div><h3 class="seg-title">One credential in detail</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>A Bachelor of Science from a university under <code>did:web</code>. The claims sit in the credential, held by the student, not on any chain.</li>
+          <li>The verifier resolves the issuer DID, gets the key, checks the signature. <b>The issuer never learns where the credential was used.</b></li>
+          <li>If the issuer key is compromised, every credential it signed is in doubt.</li>
+        </ul>
+        <p class="land">Key management is the real security boundary.</p>
+      </div>
+
+      <div class="seg is-demo" id="s15-demo">
+        <div class="seg-head"><div><div class="cue"><span class="tag is-solid">Demo</span><a class="file" href="did-flow.html" target="_blank">did-flow.html</a><span class="tag">Kit terminal</span><span class="tag">about 20 min</span></div><h3 class="seg-title">Issue, verify, tamper, rotate, revoke</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <p class="how">For each beat: show the animation step first, then run the command. Add <code>NETWORK=prismo</code> to every command.</p>
+        <ol class="steps">
+          <li><div><p>Every address is already a DID (animation step 1)</p><pre>make did STEP=resolve</pre><p>Empty history. <b>Creating a DID costs nothing and needs no transaction.</b></p></div></li>
+          <li><div><p>The university issues (steps 2 to 3)</p><pre>make did STEP=issue</pre><p>Read the header, claims and status index aloud. <b>No transaction was sent</b>: the credential lives with the student.</p></div></li>
+          <li><div><p>The employer verifies (steps 4 to 6)</p><pre>make did STEP=verify</pre><p>Three checks, VALID, and "university contacted: no". That line is the whole point of the session.</p></div></li>
+          <li><div><p>The student upgrades BSc to PhD (steps 7 to 8)</p><pre>make did STEP=tamper</pre><p>Key found, signature fails. REJECTED. One changed letter is enough.</p></div></li>
+          <li><div><p>The university adds a new key (step 9)</p><pre>make did STEP=rotate</pre><p>Open the transaction on the explorer. The DID document now lists two keys, and the history shows the block.</p></div></li>
+          <li><div><p>The key was stolen: retire it</p><pre>make did STEP=retire</pre><p>The credential signed with that key is REJECTED. <b>This is the threats slide in one command.</b></p></div></li>
+          <li><div><p>Revoke the original credential (steps 10 to 11)</p><pre>make did STEP=revoke</pre><p>Key and signature still pass; the status bit fails. REJECTED, and still no call to the university.</p></div></li>
+        </ol>
+        <p class="say">Is this JWT format standard? The structure is. The signature uses Ethereum message signing so <code>cast</code> can check it; production wallets use ES256K or EdDSA through libraries such as did-jwt-vc.</p>
+      </div>
+
+      <div class="seg" id="s15-disclose">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">07 · Disclosure</span></div><h3 class="seg-title">Selective disclosure</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>The holder reveals only what the verifier needs. <b>SD-JWT</b> hides each claim behind a salted hash and reveals chosen ones.</li>
+          <li><b>BBS signatures and zero-knowledge proofs</b> go further: prove "over 18" without showing the birth date.</li>
+          <li>Withheld claims never leave the wallet. (Not in the live demo.)</li>
+        </ul>
+        <p class="ask">What stops a verifier from asking for everything anyway? (Policy and wallet UX, not cryptography.)</p>
+      </div>
+
+      <div class="seg" id="s15-threats">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">08 · Threats</span></div><h3 class="seg-title">Threat model</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>Key theft</b> from the holder wallet: hardware-backed keys.</li>
+          <li><b>Phishing for presentations</b> by a fake verifier: verifier authentication, clear consent screens.</li>
+          <li><b>Issuer compromise</b>: key rotation and revocation. (They just watched both.)</li>
+          <li><b>Correlation</b> across verifiers from a reused DID or signature: pairwise DIDs, unlinkable proofs.</li>
+          <li><b>Lost device</b>: plan recovery before it happens, social or custodial, each with a trade-off.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s15-close">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">09 · Close</span></div><h3 class="seg-title">From research to production</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>eIDAS 2.0</b>, Regulation (EU) 2024/1183, in force since May 2024: every Member State must offer an EU Digital Identity Wallet, deadline end of 2026.</li>
+          <li>The three silos from the start become three credentials in one wallet.</li>
+          <li>Next: gas, the cost of every write we discussed tonight, and open Q&amp;A.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <section class="session" id="s16">
+      <div class="session-head">
+        <div>
+          <div class="eyebrow">Session 16</div>
+          <h2 class="session-title">Gas and Q&amp;A</h2>
+          <p class="session-goal">Goal: how gas is counted, how it is priced, and how attackers use it. Then close the four sessions as one stack.</p>
+        </div>
+        <div class="open-links">
+          <a href="session-16-gas-qa.html" target="_blank">Open deck</a>
+          <a href="descriptions.html#s16" target="_blank">Terms</a>
+        </div>
+      </div>
+
+      <div class="seg" id="s16-open">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">00 · Open</span></div><h3 class="seg-title">Why gas exists</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>The EVM is Turing-complete, so no node can know whether a call will finish: <b>the halting problem</b>.</li>
+          <li>Gas meters every step and stops execution when the budget runs out.</li>
+          <li>The same meter blocks denial of service (spam costs money) and pays the validators.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s16-cost">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">01 · Cost</span></div><h3 class="seg-title">21,000 gas</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>The cheapest transaction, a plain transfer, costs exactly <b>21,000 gas</b>: the intrinsic cost before any code runs.</li>
+          <li>Keep two numbers apart: <b>gas units</b> measure work; <b>gas price</b> in gwei is what you pay per unit. One gwei is a billionth of an ETH.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s16-budget">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">02 · Budget</span><span class="tag">03 · Blocks</span></div><h3 class="seg-title">Block budget and rollups</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Mainnet block limit: <b>60 million gas</b> (raised from 30M during 2025; Fusaka default). EIP-1559 target is half.</li>
+          <li>Above target the base fee rises, <b>at most 12.5% per block</b>; below target it falls. A raise toward about 200M is being tested with Glamsterdam: check the live figure before quoting it.</li>
+          <li>Blocks fill by gas, not transaction count: same 31.2M gas, 1,486 transfers or 4 contract calls.</li>
+          <li>Rollups move execution off mainnet. Since Dencun (March 2024), <b>EIP-4844 blobs</b> are a separate, cheaper fee market. Prismo Glassnet, where we deployed, is one of these rollups.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s16-mempool">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">04 · Mempool</span></div><h3 class="seg-title">Bidding for space</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>Each pending transaction names a max fee and a max priority fee (the tip). Builders sort by what they earn.</li>
+          <li>The low-tip contract deploy that needs more gas than is left waits for the next block.</li>
+          <li>The <b>base fee is burned</b>; only the tip goes to the validator. That removes the incentive to stuff blocks with fake transactions.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s16-attacks">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">05 · Attacks</span></div><h3 class="seg-title">Gas as a security boundary</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>Unbounded loops</b>: a loop over an array anyone can grow eventually needs more gas than a block holds, and never runs again. GovernMental (2016) froze its jackpot this way. Fix: bound loops, or let users pull.</li>
+          <li><b>Gas griefing</b>: out of gas reverts state but not the gas spent. Supply just enough for the outer call while the inner one fails. Check every low-level call's return value.</li>
+          <li><b>Front-running and sandwiches</b>: the public mempool lets anyone outbid you. Defences: commit-reveal, slippage limits, private relays.</li>
+        </ul>
+        <p class="ask">Which of these did we already see in Session 13 or 14? (Public mempool, transaction order.)</p>
+      </div>
+
+      <div class="seg" id="s16-fee">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">06 · Fee</span></div><h3 class="seg-title">Work one fee out loud</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>21,000 gas × (12 gwei base + 2 gwei tip) = <b>294,000 gwei = 0.000294 ETH</b>. The rectangle: height is gas, width is price.</li>
+          <li>Split it: 21,000 × 12 gwei burned, 21,000 × 2 gwei to the validator.</li>
+          <li>If the base fee rises past the max fee the transaction waits; unused max fee stays in the wallet.</li>
+          <li>Prices are illustrative; recent mainnet base fees are often far lower and spike under demand.</li>
+        </ul>
+      </div>
+
+      <div class="seg" id="s16-opcodes">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">07 · Opcodes</span></div><h3 class="seg-title">What each operation costs</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li>ADD costs 3 gas. A storage read costs 2,100 cold and 100 warm (EIP-2929).</li>
+          <li>Writing a non-zero value into an empty slot costs <b>20,000</b>, plus 2,100 if cold.</li>
+          <li>Storage is the expensive part: keep state small, cache reads in memory.</li>
+        </ul>
+      </div>
+
+      <div class="seg is-demo" id="s16-demo">
+        <div class="seg-head"><div><div class="cue"><span class="tag is-solid">Demo</span><span class="tag">Kit terminal</span><span class="tag">optional, 5 min</span></div><h3 class="seg-title">See real gas numbers</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ol class="steps">
+          <li><div><p>Gas per function</p><pre>forge test --gas-report</pre><p>Compare <code>increment</code> with <code>setNumber</code> and the DID registry's <code>addDelegate</code>: every write touches storage.</p></div></li>
+          <li><div><p>A real receipt</p><p>Open your Session 14 Counter or Hello World transaction on the Prismo explorer: gas used, gas price (1 gwei floor), fee in USDC.</p></div></li>
+        </ol>
+      </div>
+
+      <div class="seg" id="s16-close">
+        <div class="seg-head"><div><div class="cue"><span class="tag">Deck</span><span class="tag">08 · Close</span></div><h3 class="seg-title">Four sessions, one stack</h3></div><label class="done"><input type="checkbox">Done</label></div>
+        <ul class="points">
+          <li><b>13</b>: what a blockchain is and why it resists tampering.</li>
+          <li><b>14</b>: deploying a Solidity contract to a public testnet, and how a wallet talks to it.</li>
+          <li><b>15</b>: identity with keys, DIDs and verifiable credentials, issued and revoked live.</li>
+          <li><b>16</b>: gas, the meter that keeps it running and the attack surface that comes with it.</li>
+        </ul>
+        <p class="land">Open the floor for questions.</p>
+      </div>
+
+      <p class="foot">Sources: the speaker notes in each deck (press N), INSTRUCTOR.md for commands and resets, and the <a href="descriptions.html">Key Terms</a> glossary.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const KEY = 'aim-instructor-guide-v1';
+  const segs = [...document.querySelectorAll('.seg')];
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} };
+
+  // Outline: one entry per session, then one per card.
+  const toc = document.getElementById('toc');
+  document.querySelectorAll('.session').forEach((s) => {
+    const n = s.querySelector('.session-head .eyebrow').textContent.replace('Session ', '');
+    toc.insertAdjacentHTML('beforeend', `<li><a class="is-session" href="#${s.id}"><span>${n} · ${s.querySelector('.session-title').textContent}</span></a></li>`);
+    s.querySelectorAll('.seg').forEach((g) => {
+      const demo = g.classList.contains('is-demo') ? 'demo' : '';
+      toc.insertAdjacentHTML('beforeend', `<li><a href="#${g.id}" data-seg="${g.id}"><span>${g.querySelector('.seg-title').textContent}</span><span>${demo}</span></a></li>`);
+    });
+  });
+
+  const paint = (g) => {
+    const on = !!saved[g.id];
+    g.classList.toggle('is-done', on);
+    g.querySelector('.done input').checked = on;
+    const a = toc.querySelector(`[data-seg="${g.id}"]`); if (a) a.classList.toggle('is-done', on);
+  };
+  segs.forEach((g) => {
+    paint(g);
+    g.querySelector('.done input').addEventListener('change', (e) => { saved[g.id] = e.target.checked; save(); paint(g); });
+  });
+  document.getElementById('clear').addEventListener('click', () => { saved = {}; save(); segs.forEach(paint); });
+
+  // Highlight the card on screen in the outline.
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+    if (!en.isIntersecting) return;
+    toc.querySelectorAll('.is-here').forEach((a) => a.classList.remove('is-here'));
+    const a = toc.querySelector(`[data-seg="${en.target.id}"]`);
+    if (a) { a.classList.add('is-here'); a.scrollIntoView({ block: 'nearest' }); }
+  }), { rootMargin: '-30% 0px -60% 0px' });
+  segs.forEach((g) => io.observe(g));
+
+  // Text size for reading from a distance.
+  let size = 1;
+  try { size = parseFloat(localStorage.getItem(KEY + ':size')) || 1; } catch (e) {}
+  const setSize = (v) => { size = Math.min(1.6, Math.max(0.85, v)); document.documentElement.style.setProperty('--reading', size + 'rem'); try { localStorage.setItem(KEY + ':size', size); } catch (e) {} };
+  setSize(size);
+  document.getElementById('bigger').addEventListener('click', () => setSize(size + 0.1));
+  document.getElementById('smaller').addEventListener('click', () => setSize(size - 0.1));
+})();
+</script>
+</body>
+</html>

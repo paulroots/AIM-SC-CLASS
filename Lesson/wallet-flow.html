@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet to Blockchain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   Lumen Design System: Token Layer (Dark Theme Default)
+   ============================================================================ */
+:root {
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-11: 0.6875rem; --fs-12: 0.75rem; --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem;
+  --fs-20: 1.25rem; --fs-24: 1.5rem; --fs-36: 2.25rem;
+
+  --lh-tight: 1.1; --lh-normal: 1.5;
+  --tr-eyebrow: 0.08em;
+
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-bg-sunken: var(--ink-1000);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-400);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(90deg, transparent 88px, color-mix(in srgb, var(--color-text) 6%, transparent) 88px 89px, transparent 89px 94px, color-mix(in srgb, var(--color-text) 6%, transparent) 94px 95px, transparent 95px),
+    repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--color-text) 6%, transparent) 39px 40px),
+    var(--color-bg);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.container { max-width: 80rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.eyebrow {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+.mono { font-family: var(--font-mono); }
+
+/* -- header ---------------------------------------------------------------- */
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border-strong); }
+.page-title { font-weight: var(--fw-black); font-size: var(--fs-36); letter-spacing: -0.04em; line-height: var(--lh-tight); margin: 0.5rem 0 0 0; }
+.switch { display: flex; border: 1px solid var(--color-border-strong); }
+.switch button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text-muted); border: 0; padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.switch button[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); }
+
+/* -- stage ----------------------------------------------------------------- */
+.stage { position: relative; display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 1.3fr; gap: 2.5rem; }
+.stage::before { /* the wire every message travels along */
+  content: ""; position: absolute; left: 4%; right: 4%; top: 50%; border-top: 1px dashed var(--color-border-strong); z-index: 0;
+}
+.node {
+  position: relative; z-index: 1; min-width: 0;
+  border: 1px solid var(--color-border-strong); background: var(--color-bg-raised);
+  padding: 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; min-height: 26rem;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+.node.is-dim { opacity: 0.45; }
+.node.is-active { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.node-title { font-weight: var(--fw-bold); font-size: var(--fs-18); letter-spacing: -0.01em; margin: 0.25rem 0 0 0; }
+.node-sub { font-size: var(--fs-12); color: var(--color-text-muted); margin: 0; line-height: var(--lh-normal); }
+.row { display: flex; justify-content: space-between; gap: 0.5rem; font: var(--fw-regular) var(--fs-12) var(--font-mono); border-top: 1px solid var(--color-border); padding-top: 0.5rem; }
+.row span:first-child { color: var(--color-text-subtle); text-transform: uppercase; letter-spacing: var(--tr-eyebrow); }
+.row span:last-child { color: var(--color-text); text-align: right; overflow-wrap: anywhere; }
+.row--stack { flex-direction: column; gap: 0.25rem; }
+.row--stack span:last-child { text-align: left; }
+
+/* dApp page */
+.browser { border: 1px solid var(--color-border); background: var(--color-bg-sunken); flex: 1; display: flex; flex-direction: column; }
+.browser-bar { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.625rem; border-bottom: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.browser-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-700); }
+.browser-bar b { font-weight: var(--fw-regular); margin-left: 0.5rem; }
+.browser-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+.big { font-weight: var(--fw-black); font-size: 3rem; letter-spacing: -0.04em; line-height: 1; transition: transform 0.3s; }
+.big.bump { transform: scale(1.15); }
+.btns { display: flex; gap: 0.5rem; margin-top: auto; }
+.btn {
+  font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-border-strong); padding: 0.375rem 0.625rem; color: var(--color-text-muted); transition: all 0.3s;
+}
+.btn.is-hot { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.status { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-muted); min-height: 1.2em; }
+
+/* wallet */
+.popup {
+  border: 1px solid var(--color-accent); background: var(--color-bg-sunken); padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  opacity: 0; transform: translateY(8px) scale(0.98); transition: opacity 0.3s, transform 0.3s; min-height: 9.5rem;
+}
+.popup.is-open { opacity: 1; transform: none; }
+.popup-title { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin: 0; }
+.popup p { margin: 0; font-size: var(--fs-12); color: var(--color-text-muted); line-height: var(--lh-normal); }
+.popup .btns { margin-top: 0.25rem; }
+.key { margin-top: auto; display: flex; align-items: center; gap: 0.5rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-muted); border: 1px dashed var(--color-border-strong); padding: 0.5rem 0.625rem; transition: all 0.3s; }
+.key svg { flex: none; }
+.key.is-hot { color: var(--color-text); border-style: solid; border-color: var(--color-accent); }
+
+/* node */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.log li { border-left: 2px solid var(--color-border-strong); padding-left: 0.5rem; word-break: break-all; }
+.log li:first-child { color: var(--color-text); border-color: var(--color-accent); }
+.server { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+.server i { display: block; height: 14px; border: 1px solid var(--color-border-strong); position: relative; }
+.server i::after { content: ""; position: absolute; right: 6px; top: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-subtle); }
+.node.is-active .server i::after { background: var(--color-text); animation: blink 0.8s infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* chain */
+.mempool { border: 1px dashed var(--color-border-strong); padding: 0.5rem; min-height: 2.75rem; display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; }
+.chip { font: var(--fw-regular) var(--fs-11) var(--font-mono); border: 1px solid var(--color-border-strong); padding: 0.125rem 0.375rem; color: var(--color-text-muted); }
+.chip.is-mine { color: var(--color-text); border-color: var(--color-accent); }
+.blocks { display: flex; align-items: center; gap: 0; }
+.block { flex: 1; border: 1px solid var(--color-border-strong); padding: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); min-height: 3.75rem; display: flex; flex-direction: column; gap: 0.25rem; transition: all 0.4s; }
+.block + .link { width: 10px; border-top: 1px solid var(--color-border-strong); flex: none; }
+.block.is-open { border-style: dashed; }
+.block.is-new { border-color: var(--color-accent); color: var(--color-text); }
+.block .chip { align-self: flex-start; }
+.contract { border: 1px solid var(--color-border-strong); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.3s; }
+.contract.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.contract-name { font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.evm { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); }
+.contract.is-hot .evm { color: var(--color-text); }
+
+/* travelling message */
+.packet {
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none;
+  font: var(--fw-medium) var(--fs-12) var(--font-mono); white-space: nowrap;
+  background: var(--color-text); color: var(--color-bg); padding: 0.375rem 0.625rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* -- caption and controls --------------------------------------------------- */
+.panel { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.5rem 1.75rem; }
+.cap-title { font-weight: var(--fw-bold); font-size: var(--fs-24); letter-spacing: -0.02em; line-height: var(--lh-tight); margin: 0.5rem 0 0.75rem 0; }
+.cap-text { font-size: var(--fs-16); line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0 0 1rem 0; max-width: 52rem; }
+.cap-code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); background: var(--color-bg-sunken); border: 1px solid var(--color-border); padding: 0.625rem 0.75rem; overflow-x: auto; white-space: pre; }
+.cap-code:empty { display: none; }
+.panel > div { min-width: 0; }
+.controls { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; }
+.ctl { display: flex; gap: 0.5rem; }
+.ctl button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text); border: 1px solid var(--color-border-strong); padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.ctl button:hover { border-color: var(--color-accent); }
+.ctl button.primary { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.ctl button:disabled { opacity: 0.35; cursor: default; }
+.dots { display: flex; gap: 1rem; }
+.phase { display: flex; flex-direction: column; gap: 0.375rem; }
+.phase-dots { display: flex; gap: 4px; }
+.phase-dots button { width: 18px; height: 6px; padding: 0; border: 0; background: var(--ink-700); cursor: pointer; }
+.phase-dots button.is-done { background: var(--ink-400); }
+.phase-dots button.is-cur { background: var(--color-text); }
+.hint { font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-subtle); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; }
+
+.foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.foot div { border-top: 1px solid var(--color-border); padding-top: 0.75rem; }
+.foot p { margin: 0.375rem 0 0 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.foot a { color: var(--color-text); }
+
+@media (max-width: 62rem) {
+  .stage { grid-template-columns: 1fr 1fr; }
+  .stage::before { display: none; }
+  .panel { grid-template-columns: 1fr; }
+  .controls { align-items: flex-start; }
+  .foot { grid-template-columns: 1fr; }
+}
+@media (max-width: 40rem) {
+  body { padding: 1rem; }
+  .stage { grid-template-columns: 1fr; gap: 1rem; }
+  .node { min-height: 0; }
+  .page-title { font-size: var(--fs-24); }
+  .dots { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node, .popup, .big, .block, .contract, .key { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="page-head">
+    <div>
+      <div class="eyebrow">Smart Contracts Lab · How a dApp talks to the chain</div>
+      <h1 class="page-title">From your wallet to the blockchain</h1>
+    </div>
+    <div class="switch" role="group" aria-label="Wallet">
+      <button type="button" data-wallet="metamask" aria-pressed="true">MetaMask</button>
+      <button type="button" data-wallet="brave" aria-pressed="false">Brave Wallet</button>
+    </div>
+  </header>
+
+  <div class="stage" id="stage">
+
+    <section class="node" data-node="dapp">
+      <div>
+        <div class="eyebrow">1 · The dApp</div>
+        <h2 class="node-title">Web page</h2>
+        <p class="node-sub">HTML and JavaScript. Knows the contract's address and ABI. Cannot sign.</p>
+      </div>
+      <div class="browser">
+        <div class="browser-bar"><i></i><i></i><i></i><b>localhost:3000/counter</b></div>
+        <div class="browser-body">
+          <div class="eyebrow">Counter · number</div>
+          <div class="big" id="dNum">·</div>
+          <div class="status" id="dStatus">Not connected</div>
+          <div class="btns"><span class="btn" id="bConnect">Connect</span><span class="btn" id="bInc">Increment</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="node" data-node="wallet">
+      <div>
+        <div class="eyebrow">2 · The wallet</div>
+        <h2 class="node-title" id="wName">MetaMask</h2>
+        <p class="node-sub" id="wSub">Browser extension. Adds <span class="mono">window.ethereum</span> to every page.</p>
+      </div>
+      <div class="row"><span>Account</span><span id="wAcct">Locked to this site</span></div>
+      <div class="row"><span>Network</span><span id="wNet">Unknown</span></div>
+      <div class="popup" id="popup"></div>
+      <div class="key" id="key">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg>
+        <span id="keyText">Private key · stays here</span>
+      </div>
+    </section>
+
+    <section class="node" data-node="rpc">
+      <div>
+        <div class="eyebrow">3 · The node</div>
+        <h2 class="node-title">RPC node</h2>
+        <p class="node-sub">A computer holding a full copy of the chain. Answers questions, relays transactions.</p>
+      </div>
+      <div class="row row--stack"><span>URL</span><span>rpc.glassnet.prismo.network</span></div>
+      <ul class="log" id="rLog"></ul>
+      <div class="server" aria-hidden="true"><i></i><i></i><i></i></div>
+    </section>
+
+    <section class="node" data-node="chain">
+      <div>
+        <div class="eyebrow">4 · The blockchain</div>
+        <h2 class="node-title">Prismo Glassnet</h2>
+        <p class="node-sub">Chain ID 101001000. Every node runs the same contract code in its own EVM.</p>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:0.375rem">Mempool · waiting</div>
+        <div class="mempool" id="cPool"><span class="chip">0x3f9a…</span><span class="chip">0x8b21…</span></div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:0.375rem">Blocks · illustrative heights</div>
+        <div class="blocks">
+          <div class="block">#2,555,698<span class="chip">3 txs</span></div><div class="link"></div>
+          <div class="block">#2,555,699<span class="chip">2 txs</span></div><div class="link"></div>
+          <div class="block is-open" id="cBlock">#2,555,700<span id="cBlockTx"></span></div>
+        </div>
+      </div>
+      <div class="contract" id="cContract">
+        <div class="contract-name">Counter <span class="mono" style="font-weight:400;font-size:var(--fs-12);color:var(--color-text-muted)">0x9fA9…8841</span></div>
+        <div class="row"><span>number</span><span id="cNum">7</span></div>
+        <div class="row"><span>Last event</span><span id="cEvt">none</span></div>
+        <div class="evm" id="cEvm">EVM · idle</div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="panel" aria-live="polite">
+    <div>
+      <div class="eyebrow" id="capStep"></div>
+      <h2 class="cap-title" id="capTitle"></h2>
+      <p class="cap-text" id="capText"></p>
+      <div class="cap-code" id="capCode"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <button type="button" id="prev">Back</button>
+        <button type="button" id="play">Play</button>
+        <button type="button" id="next" class="primary">Next</button>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="hint">← → step · Space play · R restart</div>
+    </div>
+  </section>
+
+  <section class="foot">
+    <div><div class="eyebrow">The one rule</div><p>The page asks, the wallet signs, the node relays, the chain decides. Your private key never leaves the wallet.</p></div>
+    <div><div class="eyebrow">MetaMask or Brave Wallet?</div><p>Both speak the same language (EIP-1193). If both are installed, Brave's "Default Ethereum wallet" setting decides which one answers <span class="mono">window.ethereum</span>. Pages that support EIP-6963 can list both.</p></div>
+    <div><div class="eyebrow">New words?</div><p>ABI, nonce, mempool and the rest are in the <a href="descriptions.html">Key Terms</a> glossary.</p></div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  const ADDR = '0x71C7…976F';
+  const TX = '0x5e1f…a2c4';
+
+  const WALLETS = {
+    metamask: { name: 'MetaMask', sub: 'Browser extension. Adds <span class="mono">window.ethereum</span> to every page.' },
+    brave: { name: 'Brave Wallet', sub: 'Built into the Brave browser. Adds <span class="mono">window.ethereum</span> to every page.' },
+  };
+  let wallet = 'metamask';
+
+  // Each step: what moves (packets, in order), then the state once it arrives.
+  // State is cumulative: a step only lists what it changes.
+  const STEPS = [
+    { phase: 'Connect', title: 'The page asks to talk to your wallet', focus: ['dapp', 'wallet'], btn: 'bConnect',
+      text: 'A web page cannot see your wallet until you allow it. It knocks on window.ethereum, the door the wallet adds to every page, and asks for your accounts.',
+      code: "await window.ethereum.request({ method: 'eth_requestAccounts' })",
+      packets: [['dapp', 'wallet', 'eth_requestAccounts']],
+      set: { popup: 'connect', dStatus: 'Waiting for the wallet…' } },
+    { phase: 'Connect', title: 'You approve, and the wallet shares your address', focus: ['wallet', 'dapp'],
+      text: 'You press Connect in the wallet. The page receives your public address and nothing else. The private key stays locked inside the wallet, now and for every later step.',
+      code: "// result\n['0x71C7…976F']",
+      packets: [['wallet', 'dapp', ADDR]],
+      set: { popup: null, acct: ADDR, dStatus: 'Connected · ' + ADDR } },
+    { phase: 'Connect', title: 'Are we on the right network?', focus: ['dapp', 'wallet'],
+      text: 'The contract lives on one chain only. The page asks which chain the wallet is using. If it is the wrong one, the page asks the wallet to switch, and you approve that too.',
+      code: "await ethereum.request({ method: 'eth_chainId' })     // '0x6052728' = 101001000\nawait ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x6052728' }] })",
+      packets: [['dapp', 'wallet', 'eth_chainId'], ['wallet', 'dapp', '0x6052728']],
+      set: { net: 'Prismo Glassnet', dStatus: 'Prismo Glassnet · ' + ADDR } },
+
+    { phase: 'Read', title: 'Reading costs nothing', focus: ['dapp', 'rpc'],
+      text: 'To show the number, the page asks a node to run number() on the contract. The ABI tells the page how to encode that question: the 4-byte selector 0x8381f58a. No signature, no fee, no transaction.',
+      code: "eth_call { to: '0x9fA9…8841', data: '0x8381f58a' }   // number()",
+      packets: [['dapp', 'rpc', 'eth_call · number()']],
+      set: { log: 'eth_call · number()' } },
+    { phase: 'Read', title: 'The node runs the contract', focus: ['rpc', 'chain'],
+      text: 'The node loads the contract’s bytecode into its EVM and runs number() against the current state. Whatever the run computes is thrown away afterwards. Nothing is written to the chain.',
+      code: '',
+      packets: [['rpc', 'chain', 'run number()']],
+      set: { evm: 'read' } },
+    { phase: 'Read', title: 'The answer comes back', focus: ['chain', 'rpc', 'dapp'],
+      text: 'The value travels back and the page shows it. One round trip, and the blockchain is exactly as it was.',
+      code: "// result\n'0x…0007'   // 7",
+      packets: [['chain', 'rpc', '7'], ['rpc', 'dapp', '7']],
+      set: { evm: null, dNum: '7' } },
+
+    { phase: 'Write', title: 'You press Increment', focus: ['dapp', 'wallet'], btn: 'bInc',
+      text: 'Changing state needs a transaction. The page encodes increment() as 0xd09de08a and hands it to the wallet. The page cannot sign anything itself: it can only ask.',
+      code: "await ethereum.request({ method: 'eth_sendTransaction',\n  params: [{ from: '0x71C7…976F', to: '0x9fA9…8841', data: '0xd09de08a' }] })",
+      packets: [['dapp', 'wallet', 'eth_sendTransaction']],
+      set: { popup: 'tx', dStatus: 'Confirm in your wallet…' } },
+    { phase: 'Write', title: 'You confirm, and the wallet signs', focus: ['wallet'],
+      text: 'The wallet shows what you are about to sign: which contract, which data, what fee. When you confirm, it signs with your private key, inside the wallet. Read this prompt every time; it is where phishing attacks win or lose.',
+      code: 'signature = sign(keccak256(tx), privateKey)   // happens inside the wallet only',
+      packets: [],
+      set: { popup: 'signed', key: true } },
+    { phase: 'Write', title: 'The signed transaction goes to a node', focus: ['wallet', 'rpc', 'dapp'],
+      text: 'The wallet sends the signed bytes to its node. The node checks the signature, the nonce and the balance, then returns a transaction hash: a receipt number you can look up on the explorer.',
+      code: "eth_sendRawTransaction('0xf86b…')   →   '0x5e1f…a2c4'",
+      packets: [['wallet', 'rpc', 'eth_sendRawTransaction'], ['rpc', 'wallet', 'tx ' + TX], ['wallet', 'dapp', 'tx ' + TX]],
+      set: { popup: null, key: false, log: 'eth_sendRawTransaction', dStatus: 'Pending · ' + TX } },
+    { phase: 'Write', title: 'Waiting in the mempool', focus: ['rpc', 'chain'],
+      text: 'The node shares the transaction with the network. It waits, in public, until the block producer picks it up: the sequencer on Prismo, a validator on Ethereum.',
+      code: '',
+      packets: [['rpc', 'chain', 'signed tx']],
+      set: { pool: true } },
+    { phase: 'Write', title: 'A block includes it, and the EVM runs it', focus: ['chain'],
+      text: 'The transaction lands in a block. Every node runs increment() in its own EVM and reaches the same result: number goes from 7 to 8, and the contract emits NumberChanged.',
+      code: 'number = number + 1;\nemit NumberChanged(msg.sender, number);   // msg.sender = 0x71C7…976F',
+      packets: [],
+      set: { pool: false, sealed: true, cNum: '8', evt: 'NumberChanged(8)', evm: 'write' } },
+    { phase: 'Write', title: 'The page sees the result', focus: ['chain', 'rpc', 'dapp'],
+      text: 'The page asks for the receipt. Status 1 means success. It reads the NumberChanged event from the receipt and updates the screen. Anyone in the world can now see this change on the explorer.',
+      code: "eth_getTransactionReceipt('0x5e1f…a2c4')   →   { status: 1, blockNumber: 2555700, logs: [NumberChanged] }",
+      packets: [['chain', 'rpc', 'receipt · status 1'], ['rpc', 'dapp', 'NumberChanged(8)']],
+      set: { evm: null, dNum: '8', log: 'eth_getTransactionReceipt', dStatus: 'Confirmed · block #2,555,700' } },
+  ];
+
+  const BASE = { popup: null, acct: null, net: null, dStatus: 'Not connected', dNum: '·', log: null, evm: null, pool: false, sealed: false, cNum: '7', evt: 'none', key: false };
+  const stateAt = (i) => Object.assign({}, BASE, ...STEPS.slice(0, i + 1).map((s) => s.set));
+  const logsAt = (i) => STEPS.slice(0, i + 1).map((s) => s.set.log).filter(Boolean).reverse();
+
+  const $ = (id) => document.getElementById(id);
+  const stage = $('stage');
+  const nodes = Object.fromEntries([...stage.querySelectorAll('.node')].map((n) => [n.dataset.node, n]));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const POPUPS = {
+    connect: () => `<div class="eyebrow">${WALLETS[wallet].name}</div><p class="popup-title">Connect to localhost:3000?</p><p>The site will see your address and balance. It cannot move funds without asking.</p><div class="btns"><span class="btn">Cancel</span><span class="btn is-hot">Connect</span></div>`,
+    tx: () => `<div class="eyebrow">${WALLETS[wallet].name} · Confirm</div><p class="popup-title">Contract interaction</p><p class="mono">to 0x9fA9…8841<br>data 0xd09de08a · increment()<br>fee ≈ 0.00003 USDC</p><div class="btns"><span class="btn">Reject</span><span class="btn is-hot">Confirm</span></div>`,
+    signed: () => `<div class="eyebrow">${WALLETS[wallet].name}</div><p class="popup-title">Signed</p><p class="mono">r 0x4f1a…9c02<br>s 0x29c0…e7b1 · v 0</p><p>Signed with your private key, which never left the wallet.</p>`,
+  };
+
+  function apply(st) {
+    $('dNum').textContent = st.dNum;
+    $('dStatus').textContent = st.dStatus;
+    $('wAcct').textContent = st.acct || 'Locked to this site';
+    $('wNet').textContent = st.net || 'Unknown';
+    const p = $('popup');
+    p.classList.toggle('is-open', !!st.popup);
+    p.innerHTML = st.popup ? POPUPS[st.popup]() : '';
+    $('key').classList.toggle('is-hot', st.key);
+    $('keyText').textContent = st.key ? 'Private key · signing, inside the wallet' : 'Private key · stays here';
+    $('cPool').innerHTML = '<span class="chip">0x3f9a…</span><span class="chip">0x8b21…</span>' + (st.pool ? `<span class="chip is-mine">${TX}</span>` : '');
+    $('cBlock').classList.toggle('is-open', !st.sealed);
+    $('cBlock').classList.toggle('is-new', st.sealed);
+    $('cBlockTx').innerHTML = st.sealed ? '<span class="chip is-mine">your tx</span>' : '';
+    $('cNum').textContent = st.cNum;
+    $('cEvt').textContent = st.evt;
+    $('cContract').classList.toggle('is-hot', !!st.evm);
+    $('cEvm').textContent = st.evm === 'read' ? 'EVM · running number() · read only' : st.evm === 'write' ? 'EVM · running increment() · state changed' : 'EVM · idle';
+  }
+
+  function setLog(i) {
+    $('rLog').innerHTML = logsAt(i).slice(0, 4).map((l) => `<li>${l}</li>`).join('') || '<li style="border-color:var(--color-border-strong);color:var(--color-text-subtle)">idle</li>';
+  }
+
+  function focus(step) {
+    Object.entries(nodes).forEach(([k, n]) => {
+      n.classList.toggle('is-active', !!step && step.focus.includes(k));
+      n.classList.toggle('is-dim', !!step && !step.focus.includes(k));
+    });
+    ['bConnect', 'bInc'].forEach((b) => $(b).classList.toggle('is-hot', !!step && step.btn === b));
+  }
+
+  function centre(k) {
+    const s = stage.getBoundingClientRect(), r = nodes[k].getBoundingClientRect();
+    return [r.left - s.left + r.width / 2, r.top - s.top + r.height / 2];
+  }
+
+  function fly([from, to, label]) {
+    const el = document.createElement('div'); el.className = 'packet'; el.textContent = label;
+    stage.append(el);
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const [x0, y0] = centre(from), [x1, y1] = centre(to);
+    const at = (x, y) => `translate(${x - w / 2}px, ${y - h / 2}px)`;
+    if (reduced) { el.remove(); return Promise.resolve(); }
+    const a = el.animate([
+      { transform: at(x0, y0) + ' scale(0.6)', opacity: 0 },
+      { transform: at(x0, y0) + ' scale(1)', opacity: 1, offset: 0.12 },
+      { transform: at(x1, y1) + ' scale(1)', opacity: 1, offset: 0.88 },
+      { transform: at(x1, y1) + ' scale(0.6)', opacity: 0 },
+    ], { duration: 1300, easing: 'cubic-bezier(0.65, 0, 0.35, 1)' });
+    return a.finished.then(() => el.remove(), () => el.remove());
+  }
+
+  let cur = -1, run = 0, playing = false, timer = null;
+
+  function caption(i) {
+    const s = STEPS[i];
+    $('capStep').textContent = `${s.phase} · Step ${i + 1} of ${STEPS.length}`;
+    $('capTitle').textContent = s.title;
+    $('capText').textContent = s.text;
+    $('capCode').textContent = s.code;
+    $('prev').disabled = i <= 0;
+    $('next').disabled = i >= STEPS.length - 1;
+    $('next').textContent = 'Next';
+    drawDots();
+  }
+
+  async function go(i, animate) {
+    if (i < 0 || i >= STEPS.length) return;
+    const token = ++run;
+    stage.querySelectorAll('.packet').forEach((p) => p.remove());
+    cur = i; caption(i); focus(STEPS[i]);
+    if (!animate) { apply(stateAt(i)); setLog(i); return; }
+    apply(stateAt(i - 1)); setLog(i - 1);
+    for (const p of STEPS[i].packets) { await fly(p); if (token !== run) return; }
+    const before = stateAt(i - 1).dNum, after = stateAt(i);
+    apply(after); setLog(i);
+    if (before !== after.dNum) { $('dNum').classList.add('bump'); setTimeout(() => $('dNum').classList.remove('bump'), 300); }
+    if (playing) timer = setTimeout(() => { if (token === run) cur < STEPS.length - 1 ? go(cur + 1, true) : stop(); }, 3200);
+  }
+
+  function intro() {
+    cur = -1; run++; focus(null); apply(BASE); setLog(-1); drawDots();
+    $('capStep').textContent = `${STEPS.length} steps · Connect, Read, Write`;
+    $('capTitle').textContent = 'Four parts, one conversation';
+    $('capText').textContent = 'A dApp is a web page that talks to a smart contract. It never talks to the blockchain alone: the wallet signs, a node relays, and the chain runs the code. Press Next or Play to watch one connect, one read and one write.';
+    $('capCode').textContent = '';
+    $('prev').disabled = true; $('next').disabled = false; $('next').textContent = 'Start';
+  }
+
+  function stop() { playing = false; clearTimeout(timer); $('play').textContent = 'Play'; }
+  function play() {
+    if (playing) return stop();
+    playing = true; $('play').textContent = 'Pause';
+    go(cur >= STEPS.length - 1 ? 0 : cur + 1, true);
+  }
+
+  function drawDots() {
+    const phases = [...new Set(STEPS.map((s) => s.phase))];
+    $('dots').innerHTML = phases.map((ph) => `<div class="phase"><span class="hint">${ph}</span><div class="phase-dots">${
+      STEPS.map((s, i) => s.phase === ph ? `<button type="button" data-i="${i}" aria-label="Step ${i + 1}: ${s.title}" class="${i === cur ? 'is-cur' : i < cur ? 'is-done' : ''}"></button>` : '').join('')
+    }</div></div>`).join('');
+  }
+
+  $('dots').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { stop(); go(+b.dataset.i, true); } });
+  $('next').addEventListener('click', () => { stop(); go(cur + 1, true); });
+  $('prev').addEventListener('click', () => { stop(); go(cur - 1, false); });
+  $('play').addEventListener('click', play);
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight') { stop(); go(cur + 1, true); }
+    else if (e.key === 'ArrowLeft') { stop(); cur > 0 ? go(cur - 1, false) : intro(); }
+    else if (e.key === ' ') { e.preventDefault(); play(); }
+    else if (e.key === 'r' || e.key === 'R') { stop(); intro(); }
+  });
+
+  document.querySelectorAll('.switch button').forEach((b) => b.addEventListener('click', () => {
+    wallet = b.dataset.wallet;
+    document.querySelectorAll('.switch button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    $('wName').textContent = WALLETS[wallet].name;
+    $('wSub').innerHTML = WALLETS[wallet].sub;
+    apply(cur < 0 ? BASE : stateAt(cur));
+  }));
+
+  intro();
+})();
+</script>
+</body>
+</html>

@@ -24,10 +24,16 @@ ADDRESS="${ADDRESS:-$(node -e '
 
 [ -n "$ADDRESS" ] || { echo "No $CONTRACT deployment recorded for chain $CHAIN_ID. Run: make deploy NETWORK=prismo CONTRACT=$CONTRACT" >&2; exit 1; }
 
-# Constructor arguments must match what the deploy script used. Counter takes one uint256.
+# Constructor arguments must match what the deploy script used. Counter and StatusList are
+# handled here; other contracts pass CONSTRUCTOR_ARGS.
 ARGS="${CONSTRUCTOR_ARGS:-}"
 if [ -z "$ARGS" ] && [ "$CONTRACT" = "Counter" ]; then
   ARGS="$(cast abi-encode 'constructor(uint256)' "${COUNTER_INITIAL:-0}")"
+fi
+# StatusList takes the DIDRegistry address it was deployed against.
+if [ -z "$ARGS" ] && [ "$CONTRACT" = "StatusList" ]; then
+  REGISTRY="$(node -e 'const d = require("./web/deployments.json"); process.stdout.write(d[process.argv[1]].contracts.DIDRegistry.address)' "$CHAIN_ID")"
+  ARGS="$(cast abi-encode 'constructor(address)' "$REGISTRY")"
 fi
 
 echo "Verifying $CONTRACT at $ADDRESS on $NETWORK_NAME"

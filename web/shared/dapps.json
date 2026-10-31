@@ -3,5 +3,10 @@
     "contract": "Counter",
     "path": "counter",
     "title": "Counter"
+  },
+  {
+    "contract": "HelloWorld",
+    "path": "helloworld",
+    "title": "Hello World"
   }
 ]

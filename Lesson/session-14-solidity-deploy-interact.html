@@ -531,6 +531,20 @@ html, body { margin: 0; height: 100%; background: var(--color-bg-sunken); }
 .deck-notes-head { display: flex; justify-content: space-between; gap: var(--sp-4); font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin-bottom: var(--sp-2); }
 .deck-notes-body { font-size: var(--fs-16); line-height: var(--lh-normal); margin: 0; }
 
+/* Key terms: plain-language glossary for the current scene, toggled with K. */
+.deck-terms {
+  position: absolute; right: var(--sp-4); top: var(--sp-4); width: min(28rem, 92vw); max-height: 70vh; overflow: auto; z-index: 100; cursor: default;
+  padding: var(--sp-4) var(--sp-5); background: var(--color-bg-raised); border: var(--border-w) solid var(--color-border-strong); color: var(--color-text);
+}
+.deck-terms-head { display: flex; justify-content: space-between; gap: var(--sp-4); font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin-bottom: var(--sp-3); }
+.deck-term { padding: var(--sp-3) 0; border-top: var(--border-w) solid var(--color-border); }
+.deck-term h4 { font-size: var(--fs-16); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2) 0; }
+.deck-term p { font-size: var(--fs-14); line-height: var(--lh-normal); margin: 0 0 var(--sp-2) 0; }
+.deck-term p + p { color: var(--color-text-muted); font-size: var(--fs-12); }
+.deck-terms details { border-top: var(--border-w) solid var(--color-border); }
+.deck-terms summary { cursor: pointer; padding: var(--sp-2) 0; font-size: var(--fs-14); color: var(--color-text-muted); }
+.deck-terms details .deck-term { border-top: 0; padding-top: 0; }
+.deck-terms-more { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin: var(--sp-4) 0 var(--sp-2) 0; }
 </style>
 <script>
 /* inlined from vendor/gsap.min.js */
@@ -965,7 +979,7 @@ html, body { margin: 0; height: 100%; background: var(--color-bg-sunken); }
       this.stage.append(top, bot);
       this.chapterEl = top.querySelector('.deck-chapter'); this.folioEl = bot.querySelector('.deck-folio');
       const n = document.createElement('aside'); n.className = 'deck-notes'; n.hidden = true;
-      n.innerHTML = '<div class="deck-notes-head"><span class="deck-notes-where"></span><span>→ next · ← back · N notes · A autoplay · T theme · F full screen · R restart</span></div><p class="deck-notes-body"></p>';
+      n.innerHTML = '<div class="deck-notes-head"><span class="deck-notes-where"></span><span>→ next · ← back · N notes · K key terms · A autoplay · T theme · F full screen · R restart</span></div><p class="deck-notes-body"></p>';
       this.el.append(n); this.notesEl = n;
     }
     _setChapter(i, instant) {
@@ -1452,6 +1466,39 @@ D.scene({ chapter: 'Close', notes: NOTES.close }, (D) => {
   D.textIn('#e8'); D.textIn('#h8');
 });
 D.start();
+</script>
+<script>
+/* Key terms panel. Press K. Lists the plain-language terms for the scene on screen, then the rest of the session. */
+(() => {
+  const TERMS = [["Testnet (Sepolia)", "A public Ethereum test network, chain ID 11155111. Its ETH has no value, but blocks, signatures and gas behave like mainnet.", "A testnet is a flight simulator for the blockchain. Everything works like the real thing, but crashing costs nothing."], ["Bytecode", "The compiled version of your smart contract written in numbers and machine instructions.", "Think of Solidity source code as the recipe written in plain English, and bytecode as the exact, numbered instruction manual meant for the computer (the Ethereum Virtual Machine) to actually build the dish. It is what gets permanently stored on the blockchain when you deploy."], ["ABI (Application Binary Interface)", "A machine-readable list of all the functions and data types inside a smart contract.", "Think of an ABI as the menu and instruction sheet for a smart contract. It tells external apps (like Remix, MetaMask, or a website) what buttons (functions) exist, what ingredients (inputs) they need, and how to talk to the contract code living on the blockchain."], ["EVM (Ethereum Virtual Machine)", "The decentralized software environment that executes smart contract bytecode across all nodes.", "The EVM is the universal “virtual computer” running on every single node of the blockchain. No matter what physical computer or operating system a validator uses, the EVM ensures that the bytecode runs identically everywhere."], ["Deployment Transaction", "An ordinary transaction with an empty to field and the contract’s init code as its data. Deployed code is capped at 24,576 bytes by EIP-170.", "There is no special deploy button on the chain itself. Deploying is just sending a transaction addressed to nobody, carrying your program. It waits in the same queue and pays gas like any transfer."], ["Contract Address", "Derived from the deployer’s address and nonce: the last 20 bytes of keccak256 of their RLP encoding. CREATE2 offers a salt-based alternative.", "A contract’s address is not random. Like a house number that follows from the street and the plot number, anyone can work it out before the contract is deployed."], ["Gas &amp; Gas Limit", "The execution fee metric required to conduct operations or deploy code on the network.", "Gas is the fuel or processing fee you pay to run code on the blockchain. The Gas Limit is the maximum amount of fuel you are willing to let the transaction consume so it doesn’t get stuck running an infinite loop."], ["Nonce (Account Nonce)", "A sequential counter tracking the number of transactions sent from an address.", "A transaction nonce is like a digital receipt number or check sequence for your wallet. It ensures that every transaction you send is processed in exact chronological order and prevents anyone from copying your transaction and replaying it."], ["Call (Read)", "eth_call runs a function on a single node against current state. It creates no transaction, costs nothing, needs no signature, and cannot change state.", "A call is like checking your balance at an ATM screen. You look, nothing changes, and nobody charges you."], ["Transaction (Write) &amp; Function Selector", "A write is a signed transaction whose data starts with the function selector, the first four bytes of keccak256 of the function signature. It pays gas, is mined, and changes state for everyone.", "A write is like filing a form that changes the official record. You sign it, pay a fee, and once it is processed everyone sees the new state. The selector is the form number that tells the contract which function you mean."], ["Source Verification", "The process of publishing your original Solidity code so block explorers can match it against deployed bytecode.", "Source verification is like publishing the blueprint next to a locked building. It proves to the public that the compiled bytecode on the blockchain actually matches the human-readable code you claim it is."], ["Chain ID &amp; Replay Protection (EIP-155)", "EIP-155 puts the chain ID inside the signed transaction data, so a transaction signed for Sepolia cannot be replayed on mainnet.", "The chain ID is like the country written on a cheque. A cheque made out for one country cannot be cashed in another."], ["Access Control (onlyOwner, msg.sender)", "Write functions check msg.sender, the caller, against an owner set in the constructor. The ABI does not show whether that check exists; only the source does.", "Access control is the lock on the staff-only door. The ABI shows every door in the building, but only the source code shows which ones are locked. One missing lock on withdraw() lets anyone drain the funds."]];
+  const BY_CHAPTER = {"Open": [1], "Compile": [2, 3, 4], "Transaction": [5, 7], "Mempool": [5, 8], "Deploy": [5, 8], "Block": [8, 7], "Chain": [8, 7], "Address": [6, 8], "Interact": [9, 10, 11, 7], "Signature": [12, 8], "ABI": [3, 13], "Close": [11, 13]};
+  const deck = document.getElementById('deck');
+  const panel = document.createElement('aside'); panel.className = 'deck-terms'; panel.hidden = true;
+  deck.append(panel);
+  ['click', 'pointerdown', 'pointerup'].forEach((t) => panel.addEventListener(t, (e) => e.stopPropagation()));
+  const term = ([name, what, plain]) => `<div class="deck-term"><h4>${name}</h4><p>${plain}</p><p>${what}</p></div>`;
+  let chapter = '';
+  const render = () => {
+    const cur = BY_CHAPTER[chapter] || [];
+    const rest = TERMS.map((t, i) => i + 1).filter((i) => !cur.includes(i));
+    panel.innerHTML = `<div class="deck-terms-head"><span>Key terms${chapter ? ' · ' + chapter : ''}</span><span>K close</span></div>`
+      + cur.map((i) => term(TERMS[i - 1])).join('')
+      + (rest.length ? `<div class="deck-terms-more">${cur.length ? 'More in this session' : 'This session'}</div>` : '')
+      + rest.map((i) => `<details><summary>${TERMS[i - 1][0]}</summary>${term(TERMS[i - 1])}</details>`).join('');
+  };
+  const watch = () => {
+    const el = deck.querySelector('.deck-chapter');
+    if (!el) return requestAnimationFrame(watch);
+    const read = () => { const c = el.textContent.split(' · ').slice(1).join(' · ').trim(); if (c && c !== chapter) { chapter = c; render(); } };
+    new MutationObserver(read).observe(el, { childList: true, characterData: true, subtree: true });
+    read(); render();
+  };
+  watch();
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'k' || e.key === 'K') panel.hidden = !panel.hidden;
+  });
+})();
 </script>
 </body>
 </html>
