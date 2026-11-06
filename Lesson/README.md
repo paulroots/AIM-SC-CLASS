@@ -27,6 +27,7 @@ Deck controls:
 | `descriptions.html` | Key Terms: every term from Sessions 13 to 16, with a definition and a plain-language explanation |
 | `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write) |
 | `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate, and revoke a credential. Below it, the DIDRegistry and StatusList code with an explanation of each part; the code for the current step lights up. Pairs with `make did` |
+| `kyc-card-flow.html` | Scenario 2 for Session 15: one bank does KYC once, another issues a credit card from that credential, and each payment is approved by checking the phone's signature against the customer's DID. Covers a stolen card number, a lost phone, and revoked KYC, with the code for each step |
 | `instructor-guide.html` | The instructor's talking points in deck order. Useful for review after class |
 
 ## Try it yourself

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYC and Card Payments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   Lumen Design System: Token Layer (Dark Theme Default)
+   ============================================================================ */
+:root {
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-11: 0.6875rem; --fs-12: 0.75rem; --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem;
+  --fs-20: 1.25rem; --fs-24: 1.5rem; --fs-36: 2.25rem;
+
+  --lh-tight: 1.1; --lh-normal: 1.5;
+  --tr-eyebrow: 0.08em;
+
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-bg-sunken: var(--ink-1000);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-400);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(90deg, transparent 88px, color-mix(in srgb, var(--color-text) 6%, transparent) 88px 89px, transparent 89px 94px, color-mix(in srgb, var(--color-text) 6%, transparent) 94px 95px, transparent 95px),
+    repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--color-text) 6%, transparent) 39px 40px),
+    var(--color-bg);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.container { max-width: 80rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.eyebrow {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+.mono { font-family: var(--font-mono); }
+
+/* -- header ---------------------------------------------------------------- */
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border-strong); }
+.page-title { font-weight: var(--fw-black); font-size: var(--fs-36); letter-spacing: -0.04em; line-height: var(--lh-tight); margin: 0.5rem 0 0 0; }
+.switch { display: flex; border: 1px solid var(--color-border-strong); }
+.switch button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text-muted); border: 0; padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.switch button[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); }
+
+/* -- stage ----------------------------------------------------------------- */
+.stage { position: relative; display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 1.3fr; gap: 2.5rem; }
+.stage::before { /* the wire every message travels along */
+  content: ""; position: absolute; left: 4%; right: 4%; top: 50%; border-top: 1px dashed var(--color-border-strong); z-index: 0;
+}
+.node {
+  position: relative; z-index: 1; min-width: 0;
+  border: 1px solid var(--color-border-strong); background: var(--color-bg-raised);
+  padding: 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; min-height: 26rem;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+.node.is-dim { opacity: 0.45; }
+.node.is-active { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.node-title { font-weight: var(--fw-bold); font-size: var(--fs-18); letter-spacing: -0.01em; margin: 0.25rem 0 0 0; }
+.node-sub { font-size: var(--fs-12); color: var(--color-text-muted); margin: 0; line-height: var(--lh-normal); }
+.row { display: flex; justify-content: space-between; gap: 0.5rem; font: var(--fw-regular) var(--fs-12) var(--font-mono); border-top: 1px solid var(--color-border); padding-top: 0.5rem; }
+.row span:first-child { color: var(--color-text-subtle); text-transform: uppercase; letter-spacing: var(--tr-eyebrow); }
+.row span:last-child { color: var(--color-text); text-align: right; overflow-wrap: anywhere; }
+.row--stack { flex-direction: column; gap: 0.25rem; }
+.row--stack span:last-child { text-align: left; }
+
+/* dApp page */
+.browser { border: 1px solid var(--color-border); background: var(--color-bg-sunken); flex: 1; display: flex; flex-direction: column; }
+.browser-bar { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.625rem; border-bottom: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.browser-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-700); }
+.browser-bar b { font-weight: var(--fw-regular); margin-left: 0.5rem; }
+.browser-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+.big { font-weight: var(--fw-black); font-size: 3rem; letter-spacing: -0.04em; line-height: 1; transition: transform 0.3s; }
+.big.bump { transform: scale(1.15); }
+.btns { display: flex; gap: 0.5rem; margin-top: auto; }
+.btn {
+  font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-border-strong); padding: 0.375rem 0.625rem; color: var(--color-text-muted); transition: all 0.3s;
+}
+.btn.is-hot { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.status { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-muted); min-height: 1.2em; }
+
+/* wallet */
+.popup {
+  border: 1px solid var(--color-accent); background: var(--color-bg-sunken); padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  opacity: 0; transform: translateY(8px) scale(0.98); transition: opacity 0.3s, transform 0.3s; min-height: 9.5rem;
+}
+.popup.is-open { opacity: 1; transform: none; }
+.popup-title { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin: 0; }
+.popup p { margin: 0; font-size: var(--fs-12); color: var(--color-text-muted); line-height: var(--lh-normal); }
+.popup .btns { margin-top: 0.25rem; }
+.key { margin-top: auto; display: flex; align-items: center; gap: 0.5rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-muted); border: 1px dashed var(--color-border-strong); padding: 0.5rem 0.625rem; transition: all 0.3s; }
+.key svg { flex: none; }
+.key.is-hot { color: var(--color-text); border-style: solid; border-color: var(--color-accent); }
+
+/* node */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.log li { border-left: 2px solid var(--color-border-strong); padding-left: 0.5rem; word-break: break-all; }
+.log li:first-child { color: var(--color-text); border-color: var(--color-accent); }
+.server { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+.server i { display: block; height: 14px; border: 1px solid var(--color-border-strong); position: relative; }
+.server i::after { content: ""; position: absolute; right: 6px; top: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-subtle); }
+.node.is-active .server i::after { background: var(--color-text); animation: blink 0.8s infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* chain */
+.mempool { border: 1px dashed var(--color-border-strong); padding: 0.5rem; min-height: 2.75rem; display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; }
+.chip { font: var(--fw-regular) var(--fs-11) var(--font-mono); border: 1px solid var(--color-border-strong); padding: 0.125rem 0.375rem; color: var(--color-text-muted); }
+.chip.is-mine { color: var(--color-text); border-color: var(--color-accent); }
+.blocks { display: flex; align-items: center; gap: 0; }
+.block { flex: 1; border: 1px solid var(--color-border-strong); padding: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); min-height: 3.75rem; display: flex; flex-direction: column; gap: 0.25rem; transition: all 0.4s; }
+.block + .link { width: 10px; border-top: 1px solid var(--color-border-strong); flex: none; }
+.block.is-open { border-style: dashed; }
+.block.is-new { border-color: var(--color-accent); color: var(--color-text); }
+.block .chip { align-self: flex-start; }
+.contract { border: 1px solid var(--color-border-strong); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.3s; }
+.contract.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.contract-name { font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.evm { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); }
+.contract.is-hot .evm { color: var(--color-text); }
+
+/* travelling message */
+.packet {
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none;
+  font: var(--fw-medium) var(--fs-12) var(--font-mono); white-space: nowrap;
+  background: var(--color-text); color: var(--color-bg); padding: 0.375rem 0.625rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* -- caption and controls --------------------------------------------------- */
+.panel { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.5rem 1.75rem; }
+.cap-title { font-weight: var(--fw-bold); font-size: var(--fs-24); letter-spacing: -0.02em; line-height: var(--lh-tight); margin: 0.5rem 0 0.75rem 0; }
+.cap-text { font-size: var(--fs-16); line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0 0 1rem 0; max-width: 52rem; }
+.cap-code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); background: var(--color-bg-sunken); border: 1px solid var(--color-border); padding: 0.625rem 0.75rem; overflow-x: auto; white-space: pre; }
+.cap-code:empty { display: none; }
+.panel > div { min-width: 0; }
+.controls { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; }
+.ctl { display: flex; gap: 0.5rem; }
+.ctl button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text); border: 1px solid var(--color-border-strong); padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.ctl button:hover { border-color: var(--color-accent); }
+.ctl button.primary { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.ctl button:disabled { opacity: 0.35; cursor: default; }
+.dots { display: flex; gap: 1rem; }
+.phase { display: flex; flex-direction: column; gap: 0.375rem; }
+.phase-dots { display: flex; gap: 4px; }
+.phase-dots button { width: 18px; height: 6px; padding: 0; border: 0; background: var(--ink-700); cursor: pointer; }
+.phase-dots button.is-done { background: var(--ink-400); }
+.phase-dots button.is-cur { background: var(--color-text); }
+.hint { font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-subtle); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; }
+
+.foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.foot div { border-top: 1px solid var(--color-border); padding-top: 0.75rem; }
+.foot p { margin: 0.375rem 0 0 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.foot a { color: var(--color-text); }
+
+@media (max-width: 62rem) {
+  .stage { grid-template-columns: 1fr 1fr; }
+  .stage::before { display: none; }
+  .panel { grid-template-columns: 1fr; }
+  .controls { align-items: flex-start; }
+  .foot { grid-template-columns: 1fr; }
+}
+@media (max-width: 40rem) {
+  body { padding: 1rem; }
+  .stage { grid-template-columns: 1fr; gap: 1rem; }
+  .node { min-height: 0; }
+  .page-title { font-size: var(--fs-24); }
+  .dots { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node, .popup, .big, .block, .contract, .key { transition: none; }
+}
+/* -- identity pieces ------------------------------------------------------- */
+.page-head .time-tag, .time-tag {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-border-strong); padding: 0.375rem 0.75rem; white-space: nowrap;
+}
+.stage { grid-template-columns: 1fr 1fr 1fr 1.2fr; }
+.tag-off {
+  align-self: flex-start; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-accent); color: var(--color-text); padding: 0.25rem 0.5rem; opacity: 0; transition: opacity 0.3s;
+}
+.tag-off.is-on { opacity: 1; }
+.node.is-dim .tag-off.is-on { opacity: 1; }
+.cred { border: 1px solid var(--color-border-strong); background: var(--color-bg-sunken); padding: 0.875rem; display: flex; flex-direction: column; gap: 0.375rem; min-height: 8.5rem; justify-content: center; }
+.cred--small { min-height: 7rem; }
+.cred-empty { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); text-align: center; }
+.cred-name { font-weight: var(--fw-semibold); font-size: var(--fs-16); }
+.cred-claim { font-size: var(--fs-14); color: var(--color-text-muted); }
+.cred-claim.is-edited { color: var(--color-text); text-decoration: underline wavy; text-underline-offset: 3px; }
+.cred-claim em { font: normal var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; border: 1px solid var(--color-accent); padding: 0 0.25rem; margin-left: 0.5rem; text-decoration: none; display: inline-block; }
+.cred-sig { font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-subtle); }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.checks li { display: flex; gap: 0.5rem; align-items: center; font-size: var(--fs-12); color: var(--color-text-subtle); }
+.checks b { flex: none; width: 1.125rem; height: 1.125rem; border: 1px solid var(--color-border-strong); display: grid; place-items: center; font: var(--fw-bold) var(--fs-11) var(--font-mono); }
+.checks li.ok, .checks li.fail { color: var(--color-text); }
+.checks li.ok b { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.checks li.ok b::after { content: "✓"; }
+.checks li.fail b { border-color: var(--color-accent); }
+.checks li.fail b::after { content: "✕"; }
+.checks li.fail { text-decoration: line-through; text-decoration-color: var(--color-text-muted); }
+.verdict { margin-top: auto; font: var(--fw-bold) var(--fs-18) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-align: center; padding: 0.5rem; border: 1px dashed var(--color-border-strong); color: var(--color-text-subtle); min-height: 2.75rem; }
+.verdict:empty::before { content: "Waiting"; font-weight: var(--fw-regular); font-size: var(--fs-12); }
+.verdict.is-valid { background: var(--color-text); color: var(--color-bg); border-style: solid; border-color: var(--color-text); }
+.verdict.is-rejected { border: 2px solid var(--color-accent); color: var(--color-text); }
+.log li { word-break: normal; overflow-wrap: break-word; }
+.log li.is-quiet { color: var(--color-text-subtle); border-color: var(--color-border-strong); }
+.bits { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.bit { aspect-ratio: 1; border: 1px solid var(--color-border-strong); }
+.bit.is-set { background: var(--ink-600); }
+.bit.is-ours { border-color: var(--color-text-muted); }
+.bit.is-ours.is-set { background: var(--color-text); }
+.bit.is-look { box-shadow: 0 0 0 2px var(--color-bg-raised), 0 0 0 3px var(--color-accent); }
+@media (max-width: 62rem) { .stage { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 40rem) { .stage { grid-template-columns: 1fr; } }
+
+/* -- contract source -------------------------------------------------------- */
+.cap-ref { margin: 0.75rem 0 0 0; font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); }
+.cap-ref a { color: var(--color-text); }
+.src { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
+.src-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-strong); padding-bottom: 1rem; }
+.src-head h2 { font-weight: var(--fw-black); font-size: var(--fs-24); letter-spacing: -0.03em; margin: 0.5rem 0 0 0; }
+.src-head p { margin: 0.5rem 0 0 0; max-width: 52rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.src-file { display: flex; flex-direction: column; gap: 0.5rem; }
+.src-file h3 { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; font-weight: var(--fw-bold); font-size: var(--fs-18); margin: 0.75rem 0 0.25rem 0; }
+.src-file h3 .mono { font-size: var(--fs-12); font-weight: var(--fw-regular); color: var(--color-text-subtle); }
+.chunk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); border: 1px solid var(--color-border); background: var(--color-bg-raised); transition: border-color 0.3s, box-shadow 0.3s; scroll-margin-top: 1rem; }
+.chunk pre { margin: 0; padding: 0.875rem 1rem; background: var(--color-bg-sunken); border-right: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-12)/1.6 var(--font-mono); color: var(--ink-300); overflow-x: auto; }
+.chunk .note { padding: 0.875rem 1.125rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.chunk .note h4 { margin: 0; font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.chunk .note p { margin: 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.chunk .note code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); }
+.chunk .when { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin-top: auto; }
+.chunk.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.chunk.is-hot pre { color: var(--ink-100); }
+.tk-kw { color: var(--color-text); font-weight: var(--fw-medium); }
+.tk-ty { color: var(--ink-200); font-style: italic; }
+.tk-cm { color: var(--ink-500); }
+.tk-nu { color: var(--color-text); }
+@media (max-width: 62rem) { .chunk { grid-template-columns: 1fr; } .chunk pre { border-right: 0; border-bottom: 1px solid var(--color-border); } }
+@media (prefers-reduced-motion: reduce) { .chunk { transition: none; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="page-head">
+    <div>
+      <div class="eyebrow">Session 15 · Digital Identity · Scenario 2</div>
+      <h1 class="page-title">KYC once, then pay with your DID</h1>
+    </div>
+    <span class="time-tag">did:ethr on Prismo Glassnet</span>
+  </header>
+
+  <div class="stage" id="stage">
+
+    <section class="node" data-node="issuer">
+      <div>
+        <div class="eyebrow">1 · KYC provider</div>
+        <h2 class="node-title">Bank A</h2>
+        <p class="node-sub">Checks the customer’s ID once and signs the result. Keeps the ID files; they never leave the bank.</p>
+      </div>
+      <div class="row row--stack"><span>DID</span><span>did:ethr:0x6052728:0xBA4c…91F0</span></div>
+      <div class="row"><span>ID files</span><span id="iFiles">None yet</span></div>
+      <div class="key" id="iKey">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg>
+        <span id="iKeyText">Bank key · stays here</span>
+      </div>
+      <div class="tag-off" id="iOff">Not contacted</div>
+    </section>
+
+    <section class="node" data-node="holder">
+      <div>
+        <div class="eyebrow">2 · Customer</div>
+        <h2 class="node-title">Maria’s wallet</h2>
+        <p class="node-sub">Holds the KYC credential, the card, and the phone key that signs payments.</p>
+      </div>
+      <div class="cred cred--small" id="hKyc"></div>
+      <div class="row"><span>Card</span><span id="hCard">None</span></div>
+      <div class="key" id="hKey">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+        <span id="hKeyText">Phone key · not set up</span>
+      </div>
+    </section>
+
+    <section class="node" data-node="verifier">
+      <div>
+        <div class="eyebrow">3 · Card issuer</div>
+        <h2 class="node-title">Bank B</h2>
+        <p class="node-sub">Issues the card and approves every payment. Reads the chain; never sees Bank A’s ID files.</p>
+      </div>
+      <div class="cred cred--small" id="vReq"></div>
+      <ul class="checks">
+        <li id="k0"><b></b>Signing key is in Maria’s DID document</li>
+        <li id="k1"><b></b>Signature matches the request</li>
+        <li id="k2"><b></b>KYC credential not revoked</li>
+      </ul>
+      <div class="verdict" id="verdict"></div>
+    </section>
+
+    <section class="node" data-node="chain">
+      <div>
+        <div class="eyebrow">4 · Blockchain</div>
+        <h2 class="node-title">Prismo Glassnet</h2>
+        <p class="node-sub">Holds Maria’s keys and Bank A’s revocation bits. Never holds names, card numbers or amounts.</p>
+      </div>
+      <div class="contract" id="cReg">
+        <div class="contract-name">DIDRegistry <span class="evm">ERC-1056</span></div>
+        <div class="row row--stack"><span>Maria’s keys</span><span id="cKeys">#controller</span></div>
+        <ul class="log" id="cHist"></ul>
+      </div>
+      <div class="contract" id="cStat">
+        <div class="contract-name">StatusList <span class="evm">Bank A · bit 5130</span></div>
+        <div class="bits" id="bits"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="panel" aria-live="polite">
+    <div>
+      <div class="eyebrow" id="capStep"></div>
+      <h2 class="cap-title" id="capTitle"></h2>
+      <p class="cap-text" id="capText"></p>
+      <div class="cap-code" id="capCode"></div>
+      <p class="cap-ref" id="capRef"></p>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <button type="button" id="prev">Back</button>
+        <button type="button" id="play">Play</button>
+        <button type="button" id="next" class="primary">Next</button>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="hint">← → step · Space play · R restart</div>
+    </div>
+  </section>
+
+  <section class="src" id="src">
+    <div class="src-head">
+      <div>
+        <div class="eyebrow">Under the hood · what is signed, what is on chain</div>
+        <h2>The code behind each step</h2>
+        <p>Two signed documents travel off chain: the <b>KYC credential</b> and each <b>payment authorization</b>. The chain only answers two questions, using the same two contracts as the degree scenario: is this key one of Maria’s, and has Bank A revoked her KYC? As you step through the animation, the code that runs in that step lights up here.</p>
+      </div>
+      <span class="time-tag">Comments trimmed · full source in src/</span>
+    </div>
+    <div class="src-file">
+      <h3>Off chain <span class="mono">signed JSON, never written to the chain</span></h3>
+      <div id="srcOff"></div>
+    </div>
+    <div class="src-file">
+      <h3>DIDRegistry <span class="mono">src/DIDRegistry.sol · Maria’s keys</span></h3>
+      <div id="srcReg"></div>
+    </div>
+    <div class="src-file">
+      <h3>StatusList <span class="mono">src/StatusList.sol · Bank A’s KYC revocations</span></h3>
+      <div id="srcStat"></div>
+    </div>
+  </section>
+
+  <section class="foot">
+    <div><div class="eyebrow">What changes for the customer</div><p>KYC happens once. Opening a card at another bank takes a credential and a signature instead of a second ID upload, and a lost phone means a new key, not a new card number.</p></div>
+    <div><div class="eyebrow">Teaching model</div><p>Card networks today authenticate payments with tokens, 3-D Secure and passkeys, not DIDs. Reusable KYC credentials and wallet-based payment approval are being piloted, for example around the EU Digital Identity Wallet. The roles and checks here are the same ideas, simplified.</p></div>
+    <div><div class="eyebrow">See also</div><p>The degree scenario, <a href="did-flow.html">Issue, hold, verify, revoke</a>, uses the same contracts and runs live with <span class="mono">make did</span>. New words are in the <a href="descriptions.html#s15">Key Terms</a> glossary.</p></div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  const BANK_A = 'did:ethr:0x6052728:0xBA4c…91F0';
+  const MARIA = 'did:ethr:0x6052728:0x73D6…45AD';
+  const IDX = 5130;
+
+  const STEPS = [
+    { phase: 'DID', title: 'Everyone starts with a free DID', focus: ['issuer', 'holder', 'chain'],
+      text: 'Bank A and Maria each have an Ethereum address, so each already has a DID. Maria’s wallet created hers from a recovery phrase she wrote down and keeps offline. That recovery key is the controller of her DID.',
+      code: `Bank A  ${BANK_A}\nMaria   ${MARIA}   controller: recovery key (offline)`,
+      packets: [], set: {} },
+    { phase: 'DID', title: 'Maria adds her phone as a signing key', focus: ['holder', 'chain'],
+      text: 'She will not type her recovery phrase every time she pays. Instead the recovery key adds the phone’s key to her DID as a signature key. One transaction, public and permanent, and it contains no personal data.',
+      code: "DIDRegistry.addDelegate(0x73D6…45AD, 'sigAuth', phoneKey 0x5e2A…C0d4, 365 days)",
+      packets: [['holder', 'chain', 'addDelegate(phone)']],
+      set: { phone: 1, keys: '#controller (offline), #delegate-1 phone', hist: ['block 2,601,204 · #delegate-1 phone added'] } },
+
+    { phase: 'KYC', title: 'Bank A checks her ID once', focus: ['issuer', 'holder'],
+      text: 'Maria visits Bank A or uses its app: passport, selfie, liveness check, sanctions screening. This is ordinary KYC and it stays at Bank A, which must keep the files for the regulator. Nothing goes on chain.',
+      code: 'passport scan, selfie, sanctions check  →  stored at Bank A only',
+      packets: [['holder', 'issuer', 'passport + selfie']], set: { files: true } },
+    { phase: 'KYC', title: 'Bank A signs the result, not the documents', focus: ['issuer', 'holder'],
+      text: 'Bank A issues a KYC credential: who checked, whom, to what level, and when. No passport number and no photo. Maria keeps it in her wallet and can reuse it with any bank that trusts Bank A.',
+      code: "{ iss: 'did:ethr:…:0xBA4c…91F0', sub: 'did:ethr:…:0x73D6…45AD',\n  credentialSubject: { kycLevel: 'full', over18: true, residence: 'PH' },\n  credentialStatus: { statusListIndex: 5130 } }   + Bank A signature",
+      packets: [['issuer', 'holder', 'KYC credential']], set: { iSign: true, kyc: true } },
+
+    { phase: 'Card', title: 'Maria applies for a card at Bank B', focus: ['holder', 'verifier'],
+      text: 'Instead of uploading her passport again, she sends Bank B the KYC credential plus a fresh challenge signed by her phone key. The signature proves the credential is hers, not copied from someone else.',
+      code: "present(KYC credential) + sign(challenge 'b7f3…', phoneKey)",
+      packets: [['holder', 'verifier', 'KYC credential + signature']], set: { req: 'apply', hSign: true, iSign: false } },
+    { phase: 'Card', title: 'Bank B checks it without calling Bank A', focus: ['verifier', 'chain'],
+      text: 'Bank B resolves both DIDs. It checks Bank A’s signature on the credential, checks that the challenge was signed by one of Maria’s current keys, and reads Bank A’s revocation bit. All three pass.',
+      code: "DIDRegistry.validDelegate(0x73D6…45AD, 'sigAuth', 0x5e2A…C0d4)  →  true\nStatusList.isRevoked(0xBA4c…91F0, 5130)  →  false",
+      packets: [['verifier', 'chain', 'keys + status?'], ['chain', 'verifier', 'valid · not revoked']],
+      set: { hSign: false, k0: 'ok', k1: 'ok', k2: 'ok', verdict: 'APPROVED', off: true, look: true } },
+    { phase: 'Card', title: 'The card is linked to her DID', focus: ['verifier', 'holder'],
+      text: 'Bank B issues the card and records, in its own systems, that payments on it must be signed by a key in Maria’s DID document. The card number itself stays private between Maria and Bank B.',
+      code: "Bank B record: { card: '•••• 4821', holder: 'did:ethr:…:0x73D6…45AD', keyType: 'sigAuth' }",
+      packets: [['verifier', 'holder', 'card •••• 4821']], set: { card: true, req: null, k0: null, k1: null, k2: null, verdict: null, off: false, look: false } },
+
+    { phase: 'Pay', title: 'Maria pays ₱2,450 online', focus: ['holder', 'verifier'],
+      text: 'At checkout her phone signs a payment authorization: amount, merchant, card and a one-time number. The one-time number stops anyone from replaying the same approval twice.',
+      code: "{ card: '•••• 4821', amount: '2450.00 PHP', merchant: 'online store',\n  nonce: 77, time: '2026-11-06T10:42Z' }   + sign(phoneKey #delegate-1)",
+      packets: [['holder', 'verifier', 'pay ₱2,450 + signature']], set: { req: 'pay', hSign: true } },
+    { phase: 'Pay', title: 'Approved after two free reads', focus: ['verifier', 'chain'],
+      text: 'Bank B recovers the signer from the signature, asks the registry whether that key is still one of Maria’s, and reads the KYC bit. Reads are free and instant: no transaction, no waiting for a block. The chain never sees the amount or the merchant.',
+      code: "recover(signature)  →  0x5e2A…C0d4\nvalidDelegate(Maria, 'sigAuth', 0x5e2A…C0d4)  →  true · isRevoked(Bank A, 5130)  →  false",
+      packets: [['verifier', 'chain', 'validDelegate · isRevoked'], ['chain', 'verifier', 'true · false']],
+      set: { hSign: false, k0: 'ok', k1: 'ok', k2: 'ok', verdict: 'APPROVED', off: true, look: true } },
+
+    { phase: 'Fraud', title: 'A thief tries the stolen card number', focus: ['verifier', 'chain'],
+      text: 'Someone copied the card number from a leaked database and tries a ₱48,000 purchase. They can sign the request, but only with their own key, and that key is not in Maria’s DID document. Declined, without asking Maria anything.',
+      code: "recover(signature)  →  0x9e1F…77B2\nvalidDelegate(Maria, 'sigAuth', 0x9e1F…77B2)  →  false",
+      packets: [['out', 'verifier', 'pay ₱48,000 · •••• 4821'], ['verifier', 'chain', 'validDelegate?'], ['chain', 'verifier', 'false']],
+      set: { req: 'fraud', k0: 'fail', k1: null, k2: 'ok', verdict: 'DECLINED', off: true, look: false } },
+
+    { phase: 'Rotate', title: 'Maria loses her phone', focus: ['holder', 'chain'],
+      text: 'With her recovery phrase on a new phone, she removes the old phone’s key and adds the new one: two transactions. Whoever finds the old phone can no longer approve payments, and the card number stays the same.',
+      code: "revokeDelegate(Maria, 'sigAuth', 0x5e2A…C0d4)\naddDelegate(Maria, 'sigAuth', 0xC47b…19aE, 365 days)",
+      packets: [['holder', 'chain', 'revokeDelegate(old)'], ['holder', 'chain', 'addDelegate(new)']],
+      set: { req: null, k0: null, k1: null, k2: null, verdict: null, off: false, phone: 2, keys: '#controller (offline), #delegate-2 new phone',
+             hist: ['block 2,744,918 · #delegate-2 new phone added', 'block 2,744,917 · #delegate-1 phone revoked', 'block 2,601,204 · #delegate-1 phone added'] } },
+
+    { phase: 'Revoke', title: 'Bank A revokes the KYC', focus: ['issuer', 'chain'],
+      text: 'Months later the passport Maria used is reported stolen, and Bank A withdraws its KYC result by flipping bit 5130. Thousands of customers share the list, so the flip says nothing about who Maria is.',
+      code: 'StatusList.setRevoked(0xBA4c…91F0, 5130, true)',
+      packets: [['issuer', 'chain', 'setRevoked(5130)']], set: { bit: true, look: true, iSign: true } },
+    { phase: 'Revoke', title: 'Her next payment is declined', focus: ['holder', 'verifier', 'chain'],
+      text: 'Maria pays with her new phone. The key is valid and the signature is fine, but the KYC bit is set. Bank B declines and asks her to redo KYC. Bank A did not have to phone Bank B: the revocation travelled through the chain.',
+      code: "validDelegate(Maria, 'sigAuth', 0xC47b…19aE)  →  true · isRevoked(Bank A, 5130)  →  true",
+      packets: [['holder', 'verifier', 'pay ₱2,450 + signature'], ['verifier', 'chain', 'validDelegate · isRevoked'], ['chain', 'verifier', 'true · true']],
+      set: { iSign: false, req: 'pay2', k0: 'ok', k1: 'ok', k2: 'fail', verdict: 'DECLINED', off: true } },
+  ];
+
+  const SRC = {
+    srcOff: [
+      { id: 'off-kyc', title: 'The KYC credential: a result, not the documents',
+        code: `{
+  "iss": "did:ethr:0x6052728:0xBA4c…91F0",      // Bank A
+  "sub": "did:ethr:0x6052728:0x73D6…45AD",      // Maria
+  "vc": {
+    "type": ["VerifiableCredential", "KYCCredential"],
+    "credentialSubject": { "kycLevel": "full", "over18": true, "residence": "PH" },
+    "credentialStatus": { "statusListIndex": 5130 }
+  },
+  "iat": 1762300800
+}                                               // + Bank A's signature`,
+        note: `<p>The credential carries what Bank A <em>concluded</em>, not the passport scan or the selfie. Those stay in Bank A’s own systems.</p>
+               <p><code>statusListIndex</code> is Maria’s position in Bank A’s revocation list. <code>sub</code> binds the credential to Maria’s DID, so only someone holding one of her keys can present it.</p>`,
+        when: 'KYC and card steps' },
+      { id: 'off-pay', title: 'The payment authorization',
+        code: `{
+  "card": "•••• 4821",
+  "amount": "2450.00 PHP",
+  "merchant": "online store",
+  "nonce": 77,                                  // used once, stops replays
+  "time": "2026-11-06T10:42Z"
+}                                               // + signature by the phone key`,
+        note: `<p>Signed on Maria’s phone for every purchase. Bank B recovers the signing key from the signature, then asks the registry whether that key belongs to Maria.</p>
+               <p>Amount, merchant and card number travel only between Maria and Bank B. None of it is written to the chain.</p>`,
+        when: 'Pay, fraud and revoke steps' },
+    ],
+    srcReg: [
+      { id: 'reg-owner', title: 'Who may change Maria’s keys',
+        code: `function identityOwner(address identity) public view returns (address) {
+    address owner = owners[identity];
+    return owner == address(0) ? identity : owner;
+}
+
+modifier onlyOwner(address identity) {
+    if (msg.sender != identityOwner(identity)) revert NotOwner(identity, msg.sender);
+    _;
+}`,
+        note: `<p>By default an address controls its own DID, so Maria’s DID exists from the start at no cost.</p>
+               <p>Every key change is guarded by <code>onlyOwner</code>: only her controller, the offline recovery key, can add or remove phone keys. A thief with her phone cannot add their own key.</p>`,
+        when: 'DID step' },
+      { id: 'reg-valid', title: 'The check behind every payment',
+        code: `function validDelegate(address identity, bytes32 delegateType, address delegate)
+    external view returns (bool)
+{
+    return delegates[identity][delegateType][delegate] > block.timestamp;
+}`,
+        note: `<p>Bank B calls this with the key it recovered from the signature. <code>true</code> means the key is one of Maria’s and has not expired or been revoked.</p>
+               <p>It is a <code>view</code>: free, instant, and invisible to everyone else, including Bank A.</p>`,
+        when: 'Card, pay and fraud steps' },
+      { id: 'reg-add', title: 'Add a phone key',
+        code: `function addDelegate(address identity, bytes32 delegateType, address delegate, uint256 validity)
+    external onlyOwner(identity)
+{
+    uint256 validTo = block.timestamp + validity;
+    delegates[identity][delegateType][delegate] = validTo;
+    emit DIDDelegateChanged(identity, delegateType, delegate, validTo, changed[identity]);
+    changed[identity] = block.number;
+}`,
+        note: `<p>Type <code>sigAuth</code> means “may sign on Maria’s behalf”. The key expires after <code>validity</code> seconds, so a forgotten phone stops working on its own.</p>
+               <p>This is a transaction: public, permanent, and it records only addresses and times.</p>`,
+        when: 'DID and rotate steps' },
+      { id: 'reg-revoke', title: 'Lost phone: remove its key',
+        code: `function revokeDelegate(address identity, bytes32 delegateType, address delegate)
+    external onlyOwner(identity)
+{
+    delegates[identity][delegateType][delegate] = block.timestamp;
+    emit DIDDelegateChanged(identity, delegateType, delegate, block.timestamp, changed[identity]);
+    changed[identity] = block.number;
+}`,
+        note: `<p>Moves the old key’s expiry to now. From the next block, <code>validDelegate</code> returns <code>false</code> for it everywhere, at every bank, at once.</p>
+               <p>Compare a card today: losing it means a new card number and updating every subscription.</p>`,
+        when: 'Rotate step' },
+    ],
+    srcStat: [
+      { id: 'sl-set', title: 'Bank A withdraws the KYC',
+        code: `function setRevoked(address issuer, uint256 index, bool revoked) external {
+    if (registry.identityOwner(issuer) != msg.sender) revert NotIssuer(issuer, msg.sender);
+    uint256 bit = 1 << (index % 256);
+    if (revoked) words[issuer][index / 256] |= bit;
+    else words[issuer][index / 256] &= ~bit;
+    emit StatusChanged(issuer, index, revoked);
+}`,
+        note: `<p>Only Bank A’s controller can flip Bank A’s bits. For index <code>5130</code>: word <code>5130 / 256 = 20</code>, bit <code>5130 % 256 = 10</code>.</p>
+               <p>Passing <code>false</code> reinstates the credential, for example after Maria redoes KYC.</p>`,
+        when: 'Revoke step' },
+      { id: 'sl-is', title: 'Bank B reads one bit',
+        code: `function isRevoked(address issuer, uint256 index) external view returns (bool) {
+    return words[issuer][index / 256] & (1 << (index % 256)) != 0;
+}`,
+        note: `<p>Checked on card approval and on every payment. Free, and Bank A never learns that Bank B looked.</p>
+               <p>Each 256-bit word covers 256 customers, so reading it does not single out Maria.</p>`,
+        when: 'Card, pay and revoke steps' },
+    ],
+  };
+  const REFS = [
+    ['reg-owner'], ['reg-add', 'reg-owner'], [], ['off-kyc'], ['off-kyc'], ['reg-valid', 'sl-is'], [],
+    ['off-pay'], ['reg-valid', 'sl-is'], ['off-pay', 'reg-valid'], ['reg-revoke', 'reg-add'], ['sl-set'], ['reg-valid', 'sl-is'],
+  ];
+  const NAMES = { 'off-kyc': 'KYC credential', 'off-pay': 'payment authorization', 'reg-owner': 'DIDRegistry.identityOwner', 'reg-valid': 'DIDRegistry.validDelegate',
+    'reg-add': 'DIDRegistry.addDelegate', 'reg-revoke': 'DIDRegistry.revokeDelegate', 'sl-set': 'StatusList.setRevoked', 'sl-is': 'StatusList.isRevoked' };
+
+  const BASE = { files: false, iSign: false, kyc: false, card: false, phone: 0, hSign: false, req: null, k0: null, k1: null, k2: null, verdict: null,
+    off: false, keys: '#controller (offline)', hist: [], bit: false, look: false };
+  const stateAt = (i) => Object.assign({}, BASE, ...STEPS.slice(0, i + 1).map((s) => s.set));
+
+  const $ = (id) => document.getElementById(id);
+  const stage = $('stage');
+  const nodes = Object.fromEntries([...stage.querySelectorAll('.node')].map((n) => [n.dataset.node, n]));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 24 bits of Bank A's list; the one in the middle is Maria's.
+  const BITS = [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, null, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+
+  const REQ = {
+    apply: ['Card application', 'KYC credential from Bank A', 'challenge signed by #delegate-1', false],
+    pay:   ['Payment request', '₱2,450.00 · online store', 'card •••• 4821 · signed by #delegate-1', false],
+    fraud: ['Payment request', '₱48,000.00 · unknown store', 'card •••• 4821 · signed by 0x9e1F…77B2', true],
+    pay2:  ['Payment request', '₱2,450.00 · online store', 'card •••• 4821 · signed by #delegate-2', false],
+  };
+  const reqCard = (k) => !k ? '<span class="cred-empty">No request</span>' :
+    `<div class="eyebrow">${REQ[k][0]}</div><div class="cred-name">${REQ[k][1]}</div>
+     <div class="cred-sig${REQ[k][3] ? ' cred-claim is-edited' : ''}">${REQ[k][2]}</div>`;
+  const kycCard = (on, revoked) => !on ? '<span class="cred-empty">No KYC credential yet</span>' :
+    `<div class="eyebrow">KYCCredential · Bank A</div><div class="cred-name">Level full · over 18 · PH</div>
+     <div class="cred-sig">status bit ${IDX}${revoked ? ' · revoked' : ''}</div>`;
+
+  function apply(st) {
+    $('iFiles').textContent = st.files ? 'Kept at Bank A' : 'None yet';
+    $('iKey').classList.toggle('is-hot', st.iSign);
+    $('iKeyText').textContent = st.iSign ? 'Bank key · signing' : 'Bank key · stays here';
+    $('iOff').classList.toggle('is-on', st.off);
+    $('hKyc').innerHTML = kycCard(st.kyc, st.bit);
+    $('hCard').textContent = st.card ? '•••• 4821 · Bank B' : 'None';
+    $('hKey').classList.toggle('is-hot', st.hSign);
+    $('hKeyText').textContent = st.phone === 0 ? 'Phone key · not set up' : `Phone key #delegate-${st.phone}${st.hSign ? ' · signing' : ''}`;
+    $('vReq').innerHTML = reqCard(st.req);
+    ['k0', 'k1', 'k2'].forEach((k) => { $(k).className = st[k] || ''; });
+    $('verdict').textContent = st.verdict || '';
+    $('verdict').className = 'verdict' + (st.verdict ? (st.verdict === 'APPROVED' ? ' is-valid' : ' is-rejected') : '');
+    $('cKeys').textContent = st.keys;
+    $('cHist').innerHTML = st.hist.length ? st.hist.map((h) => `<li>${h}</li>`).join('') : '<li class="is-quiet">No changes. Default document.</li>';
+    $('bits').innerHTML = BITS.map((b) => b === null
+      ? `<i class="bit is-ours${st.bit ? ' is-set' : ''}${st.look ? ' is-look' : ''}" title="bit ${IDX}"></i>`
+      : `<i class="bit${b ? ' is-set' : ''}"></i>`).join('');
+  }
+
+  const KW = /(\/\/.*)|\b(contract|mapping|public|external|view|returns|return|function|event|error|modifier|if|else|revert|emit|immutable|constructor|indexed)\b|\b(address|uint256|bytes32|bool|DIDRegistry)\b|\b(\d+)\b/g;
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const hl = (code) => esc(code).replace(KW, (m, cm, kw, ty, nu) =>
+    cm ? `<span class="tk-cm">${cm}</span>` : kw ? `<span class="tk-kw">${kw}</span>` : ty ? `<span class="tk-ty">${ty}</span>` : `<span class="tk-nu">${nu}</span>`);
+  Object.entries(SRC).forEach(([box, chunks]) => {
+    $(box).innerHTML = chunks.map((c) => `<article class="chunk" id="${c.id}">
+      <pre><code>${hl(c.code)}</code></pre>
+      <div class="note"><h4>${c.title}</h4>${c.note}${c.when ? `<div class="when">${c.when}</div>` : ''}</div>
+    </article>`).join('');
+  });
+  function markCode(i) {
+    const refs = i >= 0 ? REFS[i] : [];
+    document.querySelectorAll('.chunk').forEach((c) => c.classList.toggle('is-hot', refs.includes(c.id)));
+    $('capRef').innerHTML = i < 0 ? 'The code for each step is <a href="#src">below the animation</a>.'
+      : refs.length ? 'Code: ' + refs.map((r) => `<a href="#${r}">${NAMES[r]}</a>`).join(', ') + ' ↓'
+      : 'No code runs in this step: it happens off chain, inside Bank A or Bank B.';
+  }
+
+  function focus(step) {
+    Object.entries(nodes).forEach(([k, n]) => {
+      n.classList.toggle('is-active', !!step && step.focus.includes(k));
+      n.classList.toggle('is-dim', !!step && !step.focus.includes(k));
+    });
+  }
+
+  function centre(k) {
+    const s = stage.getBoundingClientRect();
+    if (k === 'out') { const r = nodes.verifier.getBoundingClientRect(); return [r.left - s.left + r.width / 2, r.top - s.top - 24]; }
+    const r = nodes[k].getBoundingClientRect();
+    return [r.left - s.left + r.width / 2, r.top - s.top + r.height / 2];
+  }
+
+  function fly([from, to, label]) {
+    if (reduced) return Promise.resolve();
+    const el = document.createElement('div'); el.className = 'packet'; el.textContent = label;
+    stage.append(el);
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const [x0, y0] = centre(from), [x1, y1] = centre(to);
+    const at = (x, y) => `translate(${x - w / 2}px, ${y - h / 2}px)`;
+    const a = el.animate([
+      { transform: at(x0, y0) + ' scale(0.6)', opacity: 0 },
+      { transform: at(x0, y0) + ' scale(1)', opacity: 1, offset: 0.12 },
+      { transform: at(x1, y1) + ' scale(1)', opacity: 1, offset: 0.88 },
+      { transform: at(x1, y1) + ' scale(0.6)', opacity: 0 },
+    ], { duration: 1300, easing: 'cubic-bezier(0.65, 0, 0.35, 1)' });
+    return a.finished.then(() => el.remove(), () => el.remove());
+  }
+
+  let cur = -1, run = 0, playing = false, timer = null;
+
+  function caption(i) {
+    const s = STEPS[i];
+    $('capStep').textContent = `${s.phase} · Step ${i + 1} of ${STEPS.length}`;
+    $('capTitle').textContent = s.title;
+    $('capText').textContent = s.text;
+    $('capCode').textContent = s.code;
+    markCode(i);
+    $('prev').disabled = i <= 0;
+    $('next').disabled = i >= STEPS.length - 1;
+    $('next').textContent = 'Next';
+    drawDots();
+  }
+
+  async function go(i, animate) {
+    if (i < 0 || i >= STEPS.length) return;
+    const token = ++run;
+    stage.querySelectorAll('.packet').forEach((p) => p.remove());
+    cur = i; caption(i); focus(STEPS[i]);
+    if (!animate) { apply(stateAt(i)); return; }
+    apply(stateAt(i - 1));
+    for (const p of STEPS[i].packets) { await fly(p); if (token !== run) return; }
+    apply(stateAt(i));
+    if (playing) timer = setTimeout(() => { if (token === run) cur < STEPS.length - 1 ? go(cur + 1, true) : stop(); }, 3600);
+  }
+
+  function intro() {
+    cur = -1; run++; focus(null); apply(BASE); drawDots();
+    $('capStep').textContent = `${STEPS.length} steps · DID, KYC, Card, Pay, Fraud, Rotate, Revoke`;
+    $('capTitle').textContent = 'One KYC check, reused for a card and every payment';
+    $('capText').textContent = 'Bank A verifies Maria’s identity once. Bank B gives her a credit card on the strength of that check, and approves each payment by checking her phone’s signature against her DID. The blockchain holds keys and revocation bits only. Press Next or Play.';
+    $('capCode').textContent = '';
+    markCode(-1);
+    $('prev').disabled = true; $('next').disabled = false; $('next').textContent = 'Start';
+  }
+
+  function stop() { playing = false; clearTimeout(timer); $('play').textContent = 'Play'; }
+  function play() {
+    if (playing) return stop();
+    playing = true; $('play').textContent = 'Pause';
+    go(cur >= STEPS.length - 1 ? 0 : cur + 1, true);
+  }
+
+  function drawDots() {
+    const phases = [...new Set(STEPS.map((s) => s.phase))];
+    $('dots').innerHTML = phases.map((ph) => `<div class="phase"><span class="hint">${ph}</span><div class="phase-dots">${
+      STEPS.map((s, i) => s.phase === ph ? `<button type="button" data-i="${i}" aria-label="Step ${i + 1}: ${s.title}" class="${i === cur ? 'is-cur' : i < cur ? 'is-done' : ''}"></button>` : '').join('')
+    }</div></div>`).join('');
+  }
+
+  $('dots').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { stop(); go(+b.dataset.i, true); } });
+  $('next').addEventListener('click', () => { stop(); go(cur + 1, true); });
+  $('prev').addEventListener('click', () => { stop(); go(cur - 1, false); });
+  $('play').addEventListener('click', play);
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight') { stop(); go(cur + 1, true); }
+    else if (e.key === 'ArrowLeft') { stop(); cur > 0 ? go(cur - 1, false) : intro(); }
+    else if (e.key === ' ') { e.preventDefault(); play(); }
+    else if (e.key === 'r' || e.key === 'R') { stop(); intro(); }
+  });
+
+  intro();
+})();
+</script>
+</body>
+</html>
