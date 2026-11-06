@@ -28,6 +28,7 @@ Deck controls:
 | `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write) |
 | `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate, and revoke a credential. Below it, the DIDRegistry and StatusList code with an explanation of each part; the code for the current step lights up. Pairs with `make did` |
 | `kyc-card-flow.html` | Scenario 2 for Session 15: one bank does KYC once, another issues a credit card from that credential, and each payment is approved by checking the phone's signature against the customer's DID. Covers a stolen card number, a lost phone, and revoked KYC, with the code for each step |
+| `erc8004-agent-flow.html` | Scenario 3: register an AI agent under ERC-8004 (identity, reputation, validation registries), then let another agent hire it and pay through an escrow contract that releases money only after an independent check. Covers an impostor, a failed job and a refund, and selling the agent, with the code for each step |
 | `did-vs-database.html` | Why DIDs, and why on chain? Compares both scenarios with a normal database moment by moment, weighs issuer server vs shared database vs blockchain, and ends with when a database is the better choice and discussion questions |
 | `instructor-guide.html` | The instructor's talking points in deck order. Useful for review after class |
 
