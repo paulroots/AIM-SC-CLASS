@@ -209,7 +209,7 @@ The `Lesson/` folder holds the slide decks and the pages that go with them. They
 | `descriptions.html` | Key Terms glossary: every term from Sessions 13 to 16, with a definition and a plain-language explanation. |
 | `student-lab.html` | Hand this to students during the 90-minute lab: what you will do in each block and what to watch for. They do not type anything. |
 | `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write). |
-| `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate and revoke a credential. Pairs with `make did`. |
+| `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate and revoke a credential. Below it, the annotated DIDRegistry and StatusList source; the code for the current step lights up. Pairs with `make did`. |
 
 ## Prismo Glassnet facts (verified 2026-10-28)
 

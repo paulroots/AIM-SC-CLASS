@@ -255,6 +255,32 @@ body {
 .bit.is-look { box-shadow: 0 0 0 2px var(--color-bg-raised), 0 0 0 3px var(--color-accent); }
 @media (max-width: 62rem) { .stage { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 40rem) { .stage { grid-template-columns: 1fr; } }
+
+/* -- contract source -------------------------------------------------------- */
+.cap-ref { margin: 0.75rem 0 0 0; font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); }
+.cap-ref a { color: var(--color-text); }
+.src { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
+.src-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-strong); padding-bottom: 1rem; }
+.src-head h2 { font-weight: var(--fw-black); font-size: var(--fs-24); letter-spacing: -0.03em; margin: 0.5rem 0 0 0; }
+.src-head p { margin: 0.5rem 0 0 0; max-width: 52rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.src-file { display: flex; flex-direction: column; gap: 0.5rem; }
+.src-file h3 { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; font-weight: var(--fw-bold); font-size: var(--fs-18); margin: 0.75rem 0 0.25rem 0; }
+.src-file h3 .mono { font-size: var(--fs-12); font-weight: var(--fw-regular); color: var(--color-text-subtle); }
+.chunk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); border: 1px solid var(--color-border); background: var(--color-bg-raised); transition: border-color 0.3s, box-shadow 0.3s; scroll-margin-top: 1rem; }
+.chunk pre { margin: 0; padding: 0.875rem 1rem; background: var(--color-bg-sunken); border-right: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-12)/1.6 var(--font-mono); color: var(--ink-300); overflow-x: auto; }
+.chunk .note { padding: 0.875rem 1.125rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.chunk .note h4 { margin: 0; font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.chunk .note p { margin: 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.chunk .note code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); }
+.chunk .when { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin-top: auto; }
+.chunk.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.chunk.is-hot pre { color: var(--ink-100); }
+.tk-kw { color: var(--color-text); font-weight: var(--fw-medium); }
+.tk-ty { color: var(--ink-200); font-style: italic; }
+.tk-cm { color: var(--ink-500); }
+.tk-nu { color: var(--color-text); }
+@media (max-width: 62rem) { .chunk { grid-template-columns: 1fr; } .chunk pre { border-right: 0; border-bottom: 1px solid var(--color-border); } }
+@media (prefers-reduced-motion: reduce) { .chunk { transition: none; } }
 </style>
 </head>
 <body>
@@ -334,6 +360,7 @@ body {
       <h2 class="cap-title" id="capTitle"></h2>
       <p class="cap-text" id="capText"></p>
       <div class="cap-code" id="capCode"></div>
+      <p class="cap-ref" id="capRef"></p>
     </div>
     <div class="controls">
       <div class="ctl">
@@ -343,6 +370,25 @@ body {
       </div>
       <div class="dots" id="dots"></div>
       <div class="hint">← → step · Space play · R restart</div>
+    </div>
+  </section>
+
+  <section class="src" id="src">
+    <div class="src-head">
+      <div>
+        <div class="eyebrow">Under the hood · Solidity 0.8.28</div>
+        <h2>The two smart contracts</h2>
+        <p>Only two contracts run on chain. <b>DIDRegistry</b> answers “which keys does this identity use?” and <b>StatusList</b> answers “is this credential revoked?”. Everything else, including signing and checking signatures, happens off chain. As you step through the animation, the code that runs in that step lights up here.</p>
+      </div>
+      <span class="time-tag">Comments trimmed · full source in src/</span>
+    </div>
+    <div class="src-file">
+      <h3>DIDRegistry <span class="mono">src/DIDRegistry.sol · teaching copy of ERC-1056</span></h3>
+      <div id="srcReg"></div>
+    </div>
+    <div class="src-file">
+      <h3>StatusList <span class="mono">src/StatusList.sol · on-chain revocation bitstring</span></h3>
+      <div id="srcStat"></div>
     </div>
   </section>
 
@@ -410,6 +456,146 @@ body {
       code: "StatusList.isRevoked(0xA11c…E5d1, 1648)  →  true",
       packets: [['holder', 'verifier', 'credential'], ['verifier', 'chain', 'isRevoked(1648)'], ['chain', 'verifier', 'true']], set: { vcred: 'ok', k0: 'ok', k1: 'ok', k2: 'fail', verdict: 'REJECTED', off: true } },
   ];
+
+
+  // Contract source, split into chunks with an explanation each. Steps point at chunks by id.
+  const SRC = {
+    srcReg: [
+      { id: 'reg-state', title: 'Three tables, all empty at the start',
+        code: `contract DIDRegistry {
+    mapping(address identity => address owner) public owners;
+
+    mapping(address identity =>
+        mapping(bytes32 delegateType =>
+            mapping(address delegate => uint256 validTo))) public delegates;
+
+    mapping(address identity => uint256 blockNumber) public changed;`,
+        note: `<p><code>owners</code>: who controls an identity, but only if control was ever handed to someone else.</p>
+               <p><code>delegates</code>: extra signing keys, each with an expiry time. The university’s rotated key lives here.</p>
+               <p><code>changed</code>: the block of the identity’s last change, a breadcrumb for its history.</p>` },
+      { id: 'reg-events', title: 'Events are the public history',
+        code: `    event DIDOwnerChanged(address indexed identity, address owner, uint256 previousChange);
+    event DIDDelegateChanged(
+        address indexed identity, bytes32 delegateType, address delegate,
+        uint256 validTo, uint256 previousChange
+    );
+
+    error NotOwner(address identity, address caller);
+
+    modifier onlyOwner(address identity) {
+        if (msg.sender != identityOwner(identity)) revert NotOwner(identity, msg.sender);
+        _;
+    }`,
+        note: `<p>Every change emits an event. A resolver rebuilds the DID document by reading these events, and <code>previousChange</code> points at the block of the change before, so it can walk the history backwards.</p>
+               <p><code>onlyOwner</code> guards every write: only the identity’s current controller may change it.</p>`,
+        when: 'Verify step: the resolver reads these' },
+      { id: 'reg-owner', title: 'Why every address is a DID for free',
+        code: `    function identityOwner(address identity) public view returns (address) {
+        address owner = owners[identity];
+        return owner == address(0) ? identity : owner;
+    }`,
+        note: `<p>If nobody ever wrote to <code>owners</code>, the answer is “the address controls itself”. That is why creating a DID costs nothing and needs no transaction.</p>
+               <p>It is a <code>view</code> function: reading it is free and sends nothing to the chain.</p>`,
+        when: 'DID and verify steps' },
+      { id: 'reg-valid', title: 'Is this key still allowed to sign?',
+        code: `    function validDelegate(address identity, bytes32 delegateType, address delegate)
+        external view returns (bool)
+    {
+        return delegates[identity][delegateType][delegate] > block.timestamp;
+    }`,
+        note: `<p>A delegate key is valid until its expiry time. Revoking a key just moves that time to “now”.</p>` },
+      { id: 'reg-changeOwner', title: 'Recover a lost or stolen key',
+        code: `    function changeOwner(address identity, address newOwner) external onlyOwner(identity) {
+        owners[identity] = newOwner;
+        emit DIDOwnerChanged(identity, newOwner, changed[identity]);
+        changed[identity] = block.number;
+    }`,
+        note: `<p>Hands control of the DID to a new address. The DID itself stays the same, so credentials already issued keep pointing at it.</p>
+               <p>The last two lines are the history pattern used by every write: emit an event that names the previous change, then record this block.</p>` },
+      { id: 'reg-addDelegate', title: 'Key rotation, part 1: add the new key',
+        code: `    function addDelegate(address identity, bytes32 delegateType, address delegate, uint256 validity)
+        external onlyOwner(identity)
+    {
+        uint256 validTo = block.timestamp + validity;
+        delegates[identity][delegateType][delegate] = validTo;
+        emit DIDDelegateChanged(identity, delegateType, delegate, validTo, changed[identity]);
+        changed[identity] = block.number;
+    }`,
+        note: `<p>Adds a signing key for <code>validity</code> seconds. The demo uses type <code>veriKey</code> (a key that may sign credentials) and 30 days.</p>
+               <p>This is a real transaction: public, ordered and stamped with a block number.</p>`,
+        when: 'Rotate step · make did STEP=rotate' },
+      { id: 'reg-revokeDelegate', title: 'Key rotation, part 2: retire the old key',
+        code: `    function revokeDelegate(address identity, bytes32 delegateType, address delegate)
+        external onlyOwner(identity)
+    {
+        delegates[identity][delegateType][delegate] = block.timestamp;
+        emit DIDDelegateChanged(identity, delegateType, delegate, block.timestamp, changed[identity]);
+        changed[identity] = block.number;
+    }
+}`,
+        note: `<p>Sets the key’s expiry to now, so it drops out of the DID document. Credentials signed with that key are rejected from now on.</p>`,
+        when: 'make did STEP=retire' },
+    ],
+    srcStat: [
+      { id: 'sl-state', title: 'One long row of bits per issuer',
+        code: `contract StatusList {
+    DIDRegistry public immutable registry;
+
+    mapping(address issuer => mapping(uint256 word => uint256 bits)) public words;
+
+    event StatusChanged(address indexed issuer, uint256 indexed index, bool revoked);
+
+    error NotIssuer(address issuer, address caller);
+
+    constructor(DIDRegistry registry_) {
+        registry = registry_;
+    }`,
+        note: `<p>Each credential gets a position (its <code>statusListIndex</code>). Bits are stored 256 at a time, one <code>uint256</code> word each.</p>
+               <p>The list is tied to the registry, so whoever controls the university’s DID also controls its revocations.</p>` },
+      { id: 'sl-setRevoked', title: 'Revoke: flip one bit',
+        code: `    function setRevoked(address issuer, uint256 index, bool revoked) external {
+        if (registry.identityOwner(issuer) != msg.sender) revert NotIssuer(issuer, msg.sender);
+        uint256 bit = 1 << (index % 256);
+        if (revoked) words[issuer][index / 256] |= bit;
+        else words[issuer][index / 256] &= ~bit;
+        emit StatusChanged(issuer, index, revoked);
+    }`,
+        note: `<p>First it asks the registry: is the caller the university’s controller? If not, it reverts.</p>
+               <p>Then the bit math. For index <code>1648</code>: word <code>1648 / 256 = 6</code>, bit <code>1648 % 256 = 112</code>. <code>|=</code> sets the bit (revoke), <code>&amp;= ~</code> clears it (reinstate).</p>`,
+        when: 'Revoke step · make did STEP=revoke' },
+      { id: 'sl-isRevoked', title: 'Check: read one bit, for free',
+        code: `    function isRevoked(address issuer, uint256 index) external view returns (bool) {
+        return words[issuer][index / 256] & (1 << (index % 256)) != 0;
+    }
+}`,
+        note: `<p>The employer calls this. It is a <code>view</code>: no transaction, no fee, and the university never finds out.</p>
+               <p>Hundreds of credentials share each word, so a lookup does not single out one student: herd privacy.</p>`,
+        when: 'Verify and revoke steps' },
+    ],
+  };
+  const REFS = [
+    ['reg-owner'], [], [], [], ['reg-owner', 'reg-events'], ['sl-isRevoked'],
+    [], [], ['reg-addDelegate'], ['sl-setRevoked'], ['sl-isRevoked'],
+  ];
+  const NAMES = { 'reg-owner': 'DIDRegistry.identityOwner', 'reg-events': 'DIDRegistry events', 'reg-addDelegate': 'DIDRegistry.addDelegate', 'sl-setRevoked': 'StatusList.setRevoked', 'sl-isRevoked': 'StatusList.isRevoked' };
+
+  const KW = /(\/\/.*)|\b(contract|mapping|public|external|view|returns|return|function|event|error|modifier|if|else|revert|emit|immutable|constructor|indexed)\b|\b(address|uint256|bytes32|bool|DIDRegistry)\b|\b(\d+)\b/g;
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const hl = (code) => esc(code).replace(KW, (m, cm, kw, ty, nu) =>
+    cm ? `<span class="tk-cm">${cm}</span>` : kw ? `<span class="tk-kw">${kw}</span>` : ty ? `<span class="tk-ty">${ty}</span>` : `<span class="tk-nu">${nu}</span>`);
+  Object.entries(SRC).forEach(([box, chunks]) => {
+    document.getElementById(box).innerHTML = chunks.map((c) => `<article class="chunk" id="${c.id}">
+      <pre><code>${hl(c.code)}</code></pre>
+      <div class="note"><h4>${c.title}</h4>${c.note}${c.when ? `<div class="when">${c.when}</div>` : ''}</div>
+    </article>`).join('');
+  });
+  function markCode(i) {
+    const refs = i >= 0 ? REFS[i] : [];
+    document.querySelectorAll('.chunk').forEach((c) => c.classList.toggle('is-hot', refs.includes(c.id)));
+    $('capRef').innerHTML = i < 0 ? 'The contract code is <a href="#src">below the animation</a>.'
+      : refs.length ? 'Contract code: ' + refs.map((r) => `<a href="#${r}">${NAMES[r]}</a>`).join(', ') + ' ↓'
+      : 'No contract code runs in this step: it happens off chain.';
+  }
 
   const BASE = { signing: false, cred: null, vcred: null, k0: null, k1: null, k2: null, verdict: null, off: false, keys: false, hist: [], bit: false, look: false };
   const stateAt = (i) => Object.assign({}, BASE, ...STEPS.slice(0, i + 1).map((s) => s.set));
@@ -480,6 +666,7 @@ body {
     $('capTitle').textContent = s.title;
     $('capText').textContent = s.text;
     $('capCode').textContent = s.code;
+    markCode(i);
     $('prev').disabled = i <= 0;
     $('next').disabled = i >= STEPS.length - 1;
     $('next').textContent = 'Next';
@@ -504,6 +691,7 @@ body {
     $('capTitle').textContent = 'Three roles and one shared registry';
     $('capText').textContent = 'A university issues a degree, a student holds it, and an employer checks it. The blockchain sits underneath as a public phone book of keys and a list of revoked credentials. Press Next or Play.';
     $('capCode').textContent = '';
+    markCode(-1);
     $('prev').disabled = true; $('next').disabled = false; $('next').textContent = 'Start';
   }
 

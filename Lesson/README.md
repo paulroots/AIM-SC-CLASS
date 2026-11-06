@@ -26,7 +26,7 @@ Deck controls:
 | `student-lab.html` | What you will see in the 90-minute lab, block by block, and what to watch for |
 | `descriptions.html` | Key Terms: every term from Sessions 13 to 16, with a definition and a plain-language explanation |
 | `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write) |
-| `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate, and revoke a credential. Pairs with `make did` |
+| `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate, and revoke a credential. Below it, the DIDRegistry and StatusList code with an explanation of each part; the code for the current step lights up. Pairs with `make did` |
 | `instructor-guide.html` | The instructor's talking points in deck order. Useful for review after class |
 
 ## Try it yourself
