@@ -210,6 +210,7 @@ The `Lesson/` folder holds the slide decks and the pages that go with them. They
 | `student-lab.html` | Hand this to students during the 90-minute lab: what you will do in each block and what to watch for. They do not type anything. |
 | `wallet-flow.html` | Animation: how MetaMask or Brave Wallet connects a page to a contract and the chain (connect, read, write). |
 | `kyc-card-flow.html` | Scenario 2 for Session 15: reusable KYC, a credit card linked to a DID, payments signed by a phone key, a stolen card number, a lost phone, and revoked KYC. Same contracts as `did-flow.html`, annotated code below the animation. A teaching model: say so if asked how real card networks work. |
+| `did-vs-database.html` | After both scenarios: DID vs a normal database, and on chain vs issuer server vs shared database, step by step from the two scenarios. Includes when a database wins, and six discussion questions. |
 | `did-flow.html` | Animation for Session 15: issue, verify, tamper, rotate and revoke a credential. Below it, the annotated DIDRegistry and StatusList source; the code for the current step lights up. Pairs with `make did`. |
 
 ## Prismo Glassnet facts (verified 2026-10-28)

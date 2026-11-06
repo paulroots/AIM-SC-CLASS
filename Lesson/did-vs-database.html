@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DID vs Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   Lumen Design System: Token Layer (Dark Theme Default)
+   ============================================================================ */
+:root {
+  --ink-0: #ffffff;   --ink-25: #fafafa;  --ink-50: #f5f5f5;  --ink-100: #e8e8e8;
+  --ink-200: #d1d1d1; --ink-300: #b8b8b8; --ink-400: #8a8a8a; --ink-500: #6a6a6a;
+  --ink-600: #4d4d4d; --ink-700: #333333; --ink-800: #1f1f1f; --ink-850: #171717;
+  --ink-900: #111111; --ink-950: #0a0a0a; --ink-1000: #000000;
+
+  --font-sans: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-black: 800;
+
+  --fs-11: 0.6875rem; --fs-12: 0.75rem; --fs-14: 0.875rem; --fs-16: 1rem; --fs-18: 1.125rem;
+  --fs-20: 1.25rem; --fs-24: 1.5rem; --fs-36: 2.25rem;
+
+  --lh-tight: 1.1; --lh-normal: 1.5;
+  --tr-eyebrow: 0.08em;
+
+  --color-bg: var(--ink-950);
+  --color-bg-raised: var(--ink-900);
+  --color-bg-sunken: var(--ink-1000);
+  --color-text: var(--ink-25);
+  --color-text-muted: var(--ink-400);
+  --color-text-subtle: var(--ink-500);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-accent: var(--ink-25);
+
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(90deg, transparent 88px, color-mix(in srgb, var(--color-text) 6%, transparent) 88px 89px, transparent 89px 94px, color-mix(in srgb, var(--color-text) 6%, transparent) 94px 95px, transparent 95px),
+    repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--color-text) 6%, transparent) 39px 40px),
+    var(--color-bg);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.container { max-width: 80rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+.eyebrow {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+.mono { font-family: var(--font-mono); }
+
+/* -- header ---------------------------------------------------------------- */
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border-strong); }
+.page-title { font-weight: var(--fw-black); font-size: var(--fs-36); letter-spacing: -0.04em; line-height: var(--lh-tight); margin: 0.5rem 0 0 0; }
+.switch { display: flex; border: 1px solid var(--color-border-strong); }
+.switch button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text-muted); border: 0; padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.switch button[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); }
+
+/* -- stage ----------------------------------------------------------------- */
+.stage { position: relative; display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 1.3fr; gap: 2.5rem; }
+.stage::before { /* the wire every message travels along */
+  content: ""; position: absolute; left: 4%; right: 4%; top: 50%; border-top: 1px dashed var(--color-border-strong); z-index: 0;
+}
+.node {
+  position: relative; z-index: 1; min-width: 0;
+  border: 1px solid var(--color-border-strong); background: var(--color-bg-raised);
+  padding: 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; min-height: 26rem;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+.node.is-dim { opacity: 0.45; }
+.node.is-active { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.node-title { font-weight: var(--fw-bold); font-size: var(--fs-18); letter-spacing: -0.01em; margin: 0.25rem 0 0 0; }
+.node-sub { font-size: var(--fs-12); color: var(--color-text-muted); margin: 0; line-height: var(--lh-normal); }
+.row { display: flex; justify-content: space-between; gap: 0.5rem; font: var(--fw-regular) var(--fs-12) var(--font-mono); border-top: 1px solid var(--color-border); padding-top: 0.5rem; }
+.row span:first-child { color: var(--color-text-subtle); text-transform: uppercase; letter-spacing: var(--tr-eyebrow); }
+.row span:last-child { color: var(--color-text); text-align: right; overflow-wrap: anywhere; }
+.row--stack { flex-direction: column; gap: 0.25rem; }
+.row--stack span:last-child { text-align: left; }
+
+/* dApp page */
+.browser { border: 1px solid var(--color-border); background: var(--color-bg-sunken); flex: 1; display: flex; flex-direction: column; }
+.browser-bar { display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.625rem; border-bottom: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.browser-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-700); }
+.browser-bar b { font-weight: var(--fw-regular); margin-left: 0.5rem; }
+.browser-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+.big { font-weight: var(--fw-black); font-size: 3rem; letter-spacing: -0.04em; line-height: 1; transition: transform 0.3s; }
+.big.bump { transform: scale(1.15); }
+.btns { display: flex; gap: 0.5rem; margin-top: auto; }
+.btn {
+  font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-border-strong); padding: 0.375rem 0.625rem; color: var(--color-text-muted); transition: all 0.3s;
+}
+.btn.is-hot { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.status { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-muted); min-height: 1.2em; }
+
+/* wallet */
+.popup {
+  border: 1px solid var(--color-accent); background: var(--color-bg-sunken); padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  opacity: 0; transform: translateY(8px) scale(0.98); transition: opacity 0.3s, transform 0.3s; min-height: 9.5rem;
+}
+.popup.is-open { opacity: 1; transform: none; }
+.popup-title { font-weight: var(--fw-semibold); font-size: var(--fs-14); margin: 0; }
+.popup p { margin: 0; font-size: var(--fs-12); color: var(--color-text-muted); line-height: var(--lh-normal); }
+.popup .btns { margin-top: 0.25rem; }
+.key { margin-top: auto; display: flex; align-items: center; gap: 0.5rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-muted); border: 1px dashed var(--color-border-strong); padding: 0.5rem 0.625rem; transition: all 0.3s; }
+.key svg { flex: none; }
+.key.is-hot { color: var(--color-text); border-style: solid; border-color: var(--color-accent); }
+
+/* node */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); }
+.log li { border-left: 2px solid var(--color-border-strong); padding-left: 0.5rem; word-break: break-all; }
+.log li:first-child { color: var(--color-text); border-color: var(--color-accent); }
+.server { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+.server i { display: block; height: 14px; border: 1px solid var(--color-border-strong); position: relative; }
+.server i::after { content: ""; position: absolute; right: 6px; top: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-subtle); }
+.node.is-active .server i::after { background: var(--color-text); animation: blink 0.8s infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* chain */
+.mempool { border: 1px dashed var(--color-border-strong); padding: 0.5rem; min-height: 2.75rem; display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; }
+.chip { font: var(--fw-regular) var(--fs-11) var(--font-mono); border: 1px solid var(--color-border-strong); padding: 0.125rem 0.375rem; color: var(--color-text-muted); }
+.chip.is-mine { color: var(--color-text); border-color: var(--color-accent); }
+.blocks { display: flex; align-items: center; gap: 0; }
+.block { flex: 1; border: 1px solid var(--color-border-strong); padding: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-muted); min-height: 3.75rem; display: flex; flex-direction: column; gap: 0.25rem; transition: all 0.4s; }
+.block + .link { width: 10px; border-top: 1px solid var(--color-border-strong); flex: none; }
+.block.is-open { border-style: dashed; }
+.block.is-new { border-color: var(--color-accent); color: var(--color-text); }
+.block .chip { align-self: flex-start; }
+.contract { border: 1px solid var(--color-border-strong); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.3s; }
+.contract.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.contract-name { font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.evm { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); }
+.contract.is-hot .evm { color: var(--color-text); }
+
+/* travelling message */
+.packet {
+  position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none;
+  font: var(--fw-medium) var(--fs-12) var(--font-mono); white-space: nowrap;
+  background: var(--color-text); color: var(--color-bg); padding: 0.375rem 0.625rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* -- caption and controls --------------------------------------------------- */
+.panel { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.5rem 1.75rem; }
+.cap-title { font-weight: var(--fw-bold); font-size: var(--fs-24); letter-spacing: -0.02em; line-height: var(--lh-tight); margin: 0.5rem 0 0.75rem 0; }
+.cap-text { font-size: var(--fs-16); line-height: var(--lh-normal); color: var(--color-text-muted); margin: 0 0 1rem 0; max-width: 52rem; }
+.cap-code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); background: var(--color-bg-sunken); border: 1px solid var(--color-border); padding: 0.625rem 0.75rem; overflow-x: auto; white-space: pre; }
+.cap-code:empty { display: none; }
+.panel > div { min-width: 0; }
+.controls { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; }
+.ctl { display: flex; gap: 0.5rem; }
+.ctl button {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  background: transparent; color: var(--color-text); border: 1px solid var(--color-border-strong); padding: 0.5rem 0.875rem; cursor: pointer;
+}
+.ctl button:hover { border-color: var(--color-accent); }
+.ctl button.primary { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.ctl button:disabled { opacity: 0.35; cursor: default; }
+.dots { display: flex; gap: 1rem; }
+.phase { display: flex; flex-direction: column; gap: 0.375rem; }
+.phase-dots { display: flex; gap: 4px; }
+.phase-dots button { width: 18px; height: 6px; padding: 0; border: 0; background: var(--ink-700); cursor: pointer; }
+.phase-dots button.is-done { background: var(--ink-400); }
+.phase-dots button.is-cur { background: var(--color-text); }
+.hint { font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-subtle); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; }
+
+.foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.foot div { border-top: 1px solid var(--color-border); padding-top: 0.75rem; }
+.foot p { margin: 0.375rem 0 0 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.foot a { color: var(--color-text); }
+
+@media (max-width: 62rem) {
+  .stage { grid-template-columns: 1fr 1fr; }
+  .stage::before { display: none; }
+  .panel { grid-template-columns: 1fr; }
+  .controls { align-items: flex-start; }
+  .foot { grid-template-columns: 1fr; }
+}
+@media (max-width: 40rem) {
+  body { padding: 1rem; }
+  .stage { grid-template-columns: 1fr; gap: 1rem; }
+  .node { min-height: 0; }
+  .page-title { font-size: var(--fs-24); }
+  .dots { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node, .popup, .big, .block, .contract, .key { transition: none; }
+}
+/* -- identity pieces ------------------------------------------------------- */
+.page-head .time-tag, .time-tag {
+  font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-border-strong); padding: 0.375rem 0.75rem; white-space: nowrap;
+}
+.stage { grid-template-columns: 1fr 1fr 1fr 1.2fr; }
+.tag-off {
+  align-self: flex-start; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  border: 1px solid var(--color-accent); color: var(--color-text); padding: 0.25rem 0.5rem; opacity: 0; transition: opacity 0.3s;
+}
+.tag-off.is-on { opacity: 1; }
+.node.is-dim .tag-off.is-on { opacity: 1; }
+.cred { border: 1px solid var(--color-border-strong); background: var(--color-bg-sunken); padding: 0.875rem; display: flex; flex-direction: column; gap: 0.375rem; min-height: 8.5rem; justify-content: center; }
+.cred--small { min-height: 7rem; }
+.cred-empty { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); text-align: center; }
+.cred-name { font-weight: var(--fw-semibold); font-size: var(--fs-16); }
+.cred-claim { font-size: var(--fs-14); color: var(--color-text-muted); }
+.cred-claim.is-edited { color: var(--color-text); text-decoration: underline wavy; text-underline-offset: 3px; }
+.cred-claim em { font: normal var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; border: 1px solid var(--color-accent); padding: 0 0.25rem; margin-left: 0.5rem; text-decoration: none; display: inline-block; }
+.cred-sig { font: var(--fw-regular) var(--fs-11) var(--font-mono); color: var(--color-text-subtle); }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.checks li { display: flex; gap: 0.5rem; align-items: center; font-size: var(--fs-12); color: var(--color-text-subtle); }
+.checks b { flex: none; width: 1.125rem; height: 1.125rem; border: 1px solid var(--color-border-strong); display: grid; place-items: center; font: var(--fw-bold) var(--fs-11) var(--font-mono); }
+.checks li.ok, .checks li.fail { color: var(--color-text); }
+.checks li.ok b { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.checks li.ok b::after { content: "✓"; }
+.checks li.fail b { border-color: var(--color-accent); }
+.checks li.fail b::after { content: "✕"; }
+.checks li.fail { text-decoration: line-through; text-decoration-color: var(--color-text-muted); }
+.verdict { margin-top: auto; font: var(--fw-bold) var(--fs-18) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-align: center; padding: 0.5rem; border: 1px dashed var(--color-border-strong); color: var(--color-text-subtle); min-height: 2.75rem; }
+.verdict:empty::before { content: "Waiting"; font-weight: var(--fw-regular); font-size: var(--fs-12); }
+.verdict.is-valid { background: var(--color-text); color: var(--color-bg); border-style: solid; border-color: var(--color-text); }
+.verdict.is-rejected { border: 2px solid var(--color-accent); color: var(--color-text); }
+.log li { word-break: normal; overflow-wrap: break-word; }
+.log li.is-quiet { color: var(--color-text-subtle); border-color: var(--color-border-strong); }
+.bits { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.bit { aspect-ratio: 1; border: 1px solid var(--color-border-strong); }
+.bit.is-set { background: var(--ink-600); }
+.bit.is-ours { border-color: var(--color-text-muted); }
+.bit.is-ours.is-set { background: var(--color-text); }
+.bit.is-look { box-shadow: 0 0 0 2px var(--color-bg-raised), 0 0 0 3px var(--color-accent); }
+@media (max-width: 62rem) { .stage { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 40rem) { .stage { grid-template-columns: 1fr; } }
+
+/* -- contract source -------------------------------------------------------- */
+.cap-ref { margin: 0.75rem 0 0 0; font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text-subtle); }
+.cap-ref a { color: var(--color-text); }
+.src { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
+.src-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-strong); padding-bottom: 1rem; }
+.src-head h2 { font-weight: var(--fw-black); font-size: var(--fs-24); letter-spacing: -0.03em; margin: 0.5rem 0 0 0; }
+.src-head p { margin: 0.5rem 0 0 0; max-width: 52rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.src-file { display: flex; flex-direction: column; gap: 0.5rem; }
+.src-file h3 { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; font-weight: var(--fw-bold); font-size: var(--fs-18); margin: 0.75rem 0 0.25rem 0; }
+.src-file h3 .mono { font-size: var(--fs-12); font-weight: var(--fw-regular); color: var(--color-text-subtle); }
+.chunk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); border: 1px solid var(--color-border); background: var(--color-bg-raised); transition: border-color 0.3s, box-shadow 0.3s; scroll-margin-top: 1rem; }
+.chunk pre { margin: 0; padding: 0.875rem 1rem; background: var(--color-bg-sunken); border-right: 1px solid var(--color-border); font: var(--fw-regular) var(--fs-12)/1.6 var(--font-mono); color: var(--ink-300); overflow-x: auto; }
+.chunk .note { padding: 0.875rem 1.125rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.chunk .note h4 { margin: 0; font-weight: var(--fw-semibold); font-size: var(--fs-14); }
+.chunk .note p { margin: 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.chunk .note code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); }
+.chunk .when { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); margin-top: auto; }
+.chunk.is-hot { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+.chunk.is-hot pre { color: var(--ink-100); }
+.tk-kw { color: var(--color-text); font-weight: var(--fw-medium); }
+.tk-ty { color: var(--ink-200); font-style: italic; }
+.tk-cm { color: var(--ink-500); }
+.tk-nu { color: var(--color-text); }
+@media (max-width: 62rem) { .chunk { grid-template-columns: 1fr; } .chunk pre { border-right: 0; border-bottom: 1px solid var(--color-border); } }
+@media (prefers-reduced-motion: reduce) { .chunk { transition: none; } }
+</style>
+<style>
+/* -- comparison page ------------------------------------------------------- */
+.lede { font-size: var(--fs-18); line-height: var(--lh-normal); color: var(--color-text-muted); max-width: 56rem; margin: 0; }
+.lede b, .sec p b { color: var(--color-text); font-weight: var(--fw-semibold); }
+.sec { display: flex; flex-direction: column; gap: 1rem; padding-top: 1rem; scroll-margin-top: 1rem; }
+.sec > h2 { font-weight: var(--fw-black); font-size: var(--fs-24); letter-spacing: -0.03em; margin: 0.25rem 0 0 0; }
+.sec > p { margin: 0; max-width: 56rem; font-size: var(--fs-16); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.container > *, .sec > * { min-width: 0; }
+.q .mono { overflow-wrap: anywhere; }
+.lede a, .sec a { color: var(--color-text); }
+.mx code { font: var(--fw-regular) var(--fs-12) var(--font-mono); color: var(--color-text); }
+.toc { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.toc a { font: var(--fw-regular) var(--fs-12) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-muted); text-decoration: none; border: 1px solid var(--color-border-strong); padding: 0.375rem 0.75rem; }
+.toc a:hover { color: var(--color-text); border-color: var(--color-accent); }
+
+.qs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.q { border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.q h3 { margin: 0; font-size: var(--fs-18); font-weight: var(--fw-bold); }
+.q p { margin: 0; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.q .mono { font-size: var(--fs-12); color: var(--color-text); }
+
+.cmp { border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); }
+.cmp-row { display: grid; grid-template-columns: 0.8fr 1fr 1fr; border-top: 1px solid var(--color-border); }
+.cmp-row:first-child { border-top: 0; }
+.cmp-row > div { padding: 0.875rem 1rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); min-width: 0; }
+.cmp-row > div + div { border-left: 1px solid var(--color-border); }
+.cmp-row > div:first-child { color: var(--color-text); font-weight: var(--fw-semibold); }
+.cmp-row > div:last-child { color: var(--color-text); }
+.cmp-row.head > div { font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); background: var(--color-bg-sunken); }
+.cmp-row .step { display: block; margin-top: 0.375rem; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); font-weight: var(--fw-regular); }
+
+.mx { border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); overflow-x: auto; }
+.mx table { width: 100%; border-collapse: collapse; min-width: 48rem; }
+.mx th, .mx td { padding: 0.75rem 0.875rem; text-align: left; vertical-align: top; border-top: 1px solid var(--color-border); font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.mx thead th { border-top: 0; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; color: var(--color-text-subtle); background: var(--color-bg-sunken); }
+.mx tbody th { color: var(--color-text); font-weight: var(--fw-semibold); width: 22%; }
+.mx td + td, .mx th + td { border-left: 1px solid var(--color-border); }
+.v { display: inline-block; font: var(--fw-medium) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); text-transform: uppercase; padding: 0.0625rem 0.375rem; margin-right: 0.375rem; border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+.v.good { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.v.bad { border: 1px dashed var(--color-text-subtle); color: var(--color-text-subtle); }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.box { border: 1px solid var(--color-border-strong); background: var(--color-bg-raised); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.box h3 { margin: 0; font-size: var(--fs-16); font-weight: var(--fw-bold); }
+.box ul { margin: 0; padding-left: 1.125rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text-muted); }
+.box li b { color: var(--color-text); font-weight: var(--fw-semibold); }
+.box--on { border-color: var(--color-accent); }
+
+.qa { counter-reset: q; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.qa div { border-top: 1px solid var(--color-border-strong); padding-top: 0.75rem; font-size: var(--fs-14); line-height: var(--lh-normal); color: var(--color-text); }
+.qa div::before { counter-increment: q; content: "Q" counter(q); display: block; font: var(--fw-regular) var(--fs-11) var(--font-mono); letter-spacing: var(--tr-eyebrow); color: var(--color-text-subtle); margin-bottom: 0.25rem; }
+
+@media (max-width: 62rem) {
+  .qs, .split, .qa { grid-template-columns: 1fr; }
+  .cmp-row { grid-template-columns: 1fr; }
+  .cmp-row > div + div { border-left: 0; border-top: 1px dashed var(--color-border); }
+  .cmp-row.head { display: none; }
+  .cmp-row > div:nth-child(2)::before { content: "Database today · "; font: var(--fw-regular) var(--fs-11) var(--font-mono); text-transform: uppercase; color: var(--color-text-subtle); }
+  .cmp-row > div:nth-child(3)::before { content: "DID on chain · "; font: var(--fw-regular) var(--fs-11) var(--font-mono); text-transform: uppercase; color: var(--color-text-subtle); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="page-head">
+    <div>
+      <div class="eyebrow">Session 15 · Digital Identity · Why bother?</div>
+      <h1 class="page-title">DID vs a normal database</h1>
+    </div>
+    <span class="time-tag">Based on scenarios 1 and 2</span>
+  </header>
+
+  <p class="lede">Both scenarios could be built with ordinary databases, and today most of them are. This page compares the two approaches moment by moment, using the <b>degree</b> scenario (<a href="did-flow.html">University, Student, Employer</a>) and the <b>KYC and card</b> scenario (<a href="kyc-card-flow.html">Bank A, Maria, Bank B</a>). It ends with the cases where a normal database is the better choice.</p>
+
+  <nav class="toc" aria-label="Sections">
+    <a href="#two">Two separate questions</a>
+    <a href="#degree">Scenario 1 · Degree</a>
+    <a href="#kyc">Scenario 2 · KYC and card</a>
+    <a href="#chain">On chain or not</a>
+    <a href="#where">What goes where</a>
+    <a href="#db">When a database wins</a>
+    <a href="#discuss">Discussion</a>
+  </nav>
+
+  <section class="sec" id="two">
+    <div class="eyebrow">Start here</div>
+    <h2>Two separate questions</h2>
+    <p>“Use DIDs” and “use a blockchain” are different decisions. You can have either one without the other, so keep them apart when you argue for or against.</p>
+    <div class="qs">
+      <div class="q">
+        <div class="eyebrow">Question 1 · the data model</div>
+        <h3>Who holds the record, and who must be asked?</h3>
+        <p><b>Database model:</b> the university or bank keeps the record. Anyone who wants to check it has to ask that organization, every time.</p>
+        <p><b>DID model:</b> the organization signs the record and hands it to the person. Anyone can check the signature without asking the organization.</p>
+      </div>
+      <div class="q">
+        <div class="eyebrow">Question 2 · the infrastructure</div>
+        <h3>Where do the keys and revocation bits live?</h3>
+        <p>A verifier still needs two facts: <span class="mono">which keys does this issuer use?</span> and <span class="mono">is this credential revoked?</span> Those can live on the issuer’s own web server (for example <span class="mono">did:web</span>), in a shared database run by a group of banks, or on a public blockchain, as in our <span class="mono">did:ethr</span> demo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="degree">
+    <div class="eyebrow">Scenario 1 · University, Student, Employer</div>
+    <h2>A degree, checked by an employer</h2>
+    <div class="cmp" role="table" aria-label="Degree scenario: database vs DID">
+      <div class="cmp-row head" role="row"><div role="columnheader">Moment</div><div role="columnheader">With the registrar’s database</div><div role="columnheader">With a DID credential on chain</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Employer checks the degree<span class="step">Verify step</span></div><div role="cell">Email or call the registrar and wait, often days, sometimes for a fee. Needs office hours and someone to answer.</div><div role="cell">Checked in seconds on the employer’s own machine: one signature check and two free reads from the chain.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Who learns about the check<span class="step">Verify step</span></div><div role="cell">The university learns which employer is looking at which graduate, every time.</div><div role="cell">Nobody. The university is not contacted, and reading the status list does not single out one student.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">A forged diploma<span class="step">Tamper step</span></div><div role="cell">An edited PDF or a printed certificate looks real unless someone calls the registrar.</div><div role="cell">Changing one letter breaks the signature. Rejected instantly, with no phone call.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">The university changes its signing key<span class="step">Rotate step</span></div><div role="cell">Not visible to outsiders. If an old key leaks, nobody outside can tell which documents to distrust.</div><div role="cell">A public, ordered entry in the registry with a block number. Anyone can see which key was valid when.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">The degree is withdrawn<span class="step">Revoke step</span></div><div role="cell">The registrar updates its record. Anyone holding an old copy or letter does not find out unless they ask again.</div><div role="cell">One bit flips. Every later check, by anyone, sees it at once.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">The registrar is offline, merged or closed</div><div role="cell">Verification stops. Graduates of closed schools often struggle to prove their degrees.</div><div role="cell">The credential is in the graduate’s wallet and the keys are on the chain. Checks keep working.</div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="kyc">
+    <div class="eyebrow">Scenario 2 · Bank A, Maria, Bank B</div>
+    <h2>KYC once, then a card and payments</h2>
+    <div class="cmp" role="table" aria-label="KYC and card scenario: database vs DID">
+      <div class="cmp-row head" role="row"><div role="columnheader">Moment</div><div role="columnheader">With each bank’s own database</div><div role="columnheader">With a DID credential on chain</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Opening an account at a second bank<span class="step">Card step</span></div><div role="cell">Upload the passport and selfie again. Bank B repeats and pays for the whole KYC process.</div><div role="cell">Present Bank A’s KYC credential and sign a challenge. Bank B checks it in seconds.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Copies of the passport</div><div role="cell">One copy per bank, app and lender Maria has used. Each copy is another place it can leak from.</div><div role="cell">One copy, at Bank A. Bank B receives a result (“KYC level full, over 18”), not the document.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Approving a payment<span class="step">Pay step</span></div><div role="cell">The card number, expiry and CVV act as a shared password. Anyone who has them can try to pay.</div><div role="cell">Each payment must be signed by a key in Maria’s DID document. The card number alone is useless.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Card number leaked<span class="step">Fraud step</span></div><div role="cell">Fraud runs until a pattern is spotted or Maria notices. Then she gets a new card.</div><div role="cell">Declined at the first try: the thief’s key is not hers. No fraud model needed for this case.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Lost phone<span class="step">Rotate step</span></div><div role="cell">Cancel the card, wait for a new number, update every subscription and saved payment.</div><div role="cell">Remove the old phone’s key and add the new one. Same card number, nothing else to update.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">KYC withdrawn<span class="step">Revoke step</span></div><div role="cell">Bank A has no standard way to tell every bank that relied on its check. Each relationship is a separate integration, if it exists at all.</div><div role="cell">Bank A flips one bit. Every bank that checks sees it on the next payment, without Bank A knowing who they are.</div></div>
+      <div class="cmp-row" role="row"><div role="cell">A breach at the operator</div><div role="cell">A central KYC database is a honeypot: names, ID numbers, photos and addresses in one place.</div><div role="cell">The chain holds addresses, key expiry times and bits. A full copy of it reveals no names.</div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="chain">
+    <div class="eyebrow">Question 2</div>
+    <h2>Why put the registry and status list on chain?</h2>
+    <p>Keep the DID model and change only where the two lookups live: the <b>keys</b> (DIDRegistry) and the <b>revocation bits</b> (StatusList). Here are the three realistic options, judged by what the two scenarios need.</p>
+    <div class="mx">
+      <table>
+        <thead><tr><th>What the scenarios need</th><th>Issuer’s own server<br>(e.g. did:web)</th><th>Shared database<br>(run by a bank group)</th><th>Public blockchain<br>(our did:ethr demo)</th></tr></thead>
+        <tbody>
+          <tr><th>Nobody can quietly change or backdate a key or a bit</th>
+            <td><span class="v bad">No</span>The operator, or anyone who hacks the server, can edit it.</td>
+            <td><span class="v">Partly</span>Safe from outsiders; the operator can still edit it.</td>
+            <td><span class="v good">Yes</span>Only the identity’s controller can write, and every change is recorded with a block number.</td></tr>
+          <tr><th>Full history of keys: which was valid when</th>
+            <td><span class="v bad">No</span>Usually only the current state.</td>
+            <td><span class="v">Partly</span>If the operator keeps audit logs.</td>
+            <td><span class="v good">Yes</span>The <code>DIDDelegateChanged</code> events chain back through <code>previousChange</code>.</td></tr>
+          <tr><th>Keeps working if the issuer goes offline or closes</th>
+            <td><span class="v bad">No</span>The DID stops resolving with the website.</td>
+            <td><span class="v">Partly</span>As long as the group runs it.</td>
+            <td><span class="v good">Yes</span>Every node keeps a copy, and anyone can run one.</td></tr>
+          <tr><th>Issuer does not learn who is checking</th>
+            <td><span class="v bad">No</span>Its server logs every lookup.</td>
+            <td><span class="v">Partly</span>The operator sees every lookup.</td>
+            <td><span class="v good">Yes</span>Verifiers read from any node, or run their own. (A public RPC provider does see the query.)</td></tr>
+          <tr><th>New issuers and verifiers can join without permission</th>
+            <td><span class="v good">Yes</span>Anyone can host a file.</td>
+            <td><span class="v bad">No</span>Needs a contract with the operator.</td>
+            <td><span class="v good">Yes</span>Any address is a DID; any node can be read.</td></tr>
+          <tr><th>Cost and speed of a change (rotate, revoke)</th>
+            <td><span class="v good">Free</span>Instant.</td>
+            <td><span class="v good">Free</span>Instant.</td>
+            <td><span class="v">Fee</span>A small fee and one block. On Prismo the whole degree demo costs well under 0.01 USDC.</td></tr>
+          <tr><th>Mistakes can be erased</th>
+            <td><span class="v good">Yes</span></td>
+            <td><span class="v good">Yes</span></td>
+            <td><span class="v bad">No</span>Everything written is permanent and public. That is why no personal data ever goes there.</td></tr>
+          <tr><th>Who resets a lost recovery key</th>
+            <td><span class="v good">Admin</span>The operator.</td>
+            <td><span class="v good">Admin</span>The operator.</td>
+            <td><span class="v bad">Nobody</span>Lose the controller key and the DID is stuck. Key management is the real security boundary.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec" id="where">
+    <div class="eyebrow">The one rule</div>
+    <h2>What goes on chain, and what never does</h2>
+    <p>The advantages above only hold if the chain stores lookups, never people. Both scenarios follow the same split.</p>
+    <div class="split">
+      <div class="box box--on">
+        <div class="eyebrow">On chain · public and permanent</div>
+        <h3>Facts that verifiers need and nobody minds being public</h3>
+        <ul>
+          <li><b>Addresses</b> of the university, Bank A and Maria: her DID is a random-looking number, not her name.</li>
+          <li><b>Keys and their expiry times</b>: #controller, the phone key, the rotated key.</li>
+          <li><b>Revocation bits</b>: bit 1648 for the degree, bit 5130 for the KYC, among thousands of others.</li>
+          <li><b>The history of changes</b>, with block numbers.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="eyebrow">Off chain · with the person or the issuer</div>
+        <h3>Anything about a person</h3>
+        <ul>
+          <li><b>The credentials</b>: Juan’s name and degree, Maria’s KYC result. In their wallets.</li>
+          <li><b>Passport scans and selfies</b>: at Bank A only, which must keep them for the regulator.</li>
+          <li><b>Card number, amounts, merchants</b>: between Maria and Bank B only.</li>
+          <li><b>Who checked whom</b>: not recorded anywhere.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="db">
+    <div class="eyebrow">Be fair</div>
+    <h2>When a normal database is the better choice</h2>
+    <p>DIDs and a blockchain earn their cost when <b>several organizations that do not fully trust each other</b> must check the same claims, and the person should carry the proof. Without that, a database is simpler, cheaper and easier to fix.</p>
+    <div class="split">
+      <div class="box">
+        <div class="eyebrow">Choose a database when</div>
+        <h3>One organization, no outside verifiers</h3>
+        <ul>
+          <li><b>Only you read the data.</b> A university’s internal grade book does not need to be verifiable by strangers.</li>
+          <li><b>The data must be edited or deleted.</b> Personal records under privacy law belong in a database; a chain cannot erase.</li>
+          <li><b>You need many writes per second</b>, such as every card payment itself. In scenario 2 only key changes and revocations touch the chain.</li>
+          <li><b>Users cannot manage keys.</b> A database admin can reset a password; nobody can reset a lost recovery phrase.</li>
+          <li><b>A regulator requires a central operator</b> who answers for the records.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="eyebrow">The honest costs of DIDs</div>
+        <h3>What the demos make look easier than it is</h3>
+        <ul>
+          <li><b>Adoption.</b> A credential is only useful if verifiers accept it. Employers and banks must decide which issuers to trust.</li>
+          <li><b>Recovery.</b> Maria’s offline recovery key is the weakest point: lost, the DID is frozen; stolen, the thief can add keys.</li>
+          <li><b>Standards still settling.</b> Formats, selective disclosure and wallet support are improving, but not yet everywhere.</li>
+          <li><b>The issuer is still trusted.</b> A signature proves Bank A said it, not that Bank A checked properly.</li>
+          <li><b>Payments today already have strong tools</b>, such as tokens, 3-D Secure and passkeys. Scenario 2 is a model, not a replacement plan.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="discuss">
+    <div class="eyebrow">For class</div>
+    <h2>Discussion questions</h2>
+    <div class="qa">
+      <div>The employer never contacted the university. Who benefits from that, and could anyone lose from it?</div>
+      <div>Maria’s phone key is on chain but her name is not. Could someone still link her DID to her? How?</div>
+      <div>Bank A is hacked and its signing key stolen. Walk through what Bank A should do, using only the contract functions you have seen.</div>
+      <div>Which parts of scenario 2 would still work if the registry ran on Bank A’s own web server instead? Which would break?</div>
+      <div>Name one record at your own school or workplace that should stay in a normal database, and one that might benefit from being a credential.</div>
+      <div>A university closes. With today’s systems, how would a graduate prove their degree ten years later? With DIDs?</div>
+    </div>
+  </section>
+
+  <section class="foot">
+    <div><div class="eyebrow">Scenario 1</div><p><a href="did-flow.html">Issue, hold, verify, revoke</a>: a degree credential, with the contract code. Runs live with <span class="mono">make did</span>.</p></div>
+    <div><div class="eyebrow">Scenario 2</div><p><a href="kyc-card-flow.html">KYC once, then pay with your DID</a>: reusable KYC, a card, a stolen number and a lost phone.</p></div>
+    <div><div class="eyebrow">Words</div><p>DID, controller, delegate, status list and the rest are in the <a href="descriptions.html#s15">Key Terms</a> glossary.</p></div>
+  </section>
+
+</div>
+</body>
+</html>
